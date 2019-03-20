@@ -331,7 +331,6 @@ class ParseMailBox
             }
             $i++;
         }
-
         return $foldersFromExchange;
     }
 

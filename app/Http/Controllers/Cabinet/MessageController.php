@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Cabinet;
 
 use App\Entity\Email\Message;
-use Carbon\Carbon;
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;

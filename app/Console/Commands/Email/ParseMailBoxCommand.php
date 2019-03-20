@@ -5,7 +5,9 @@ namespace App\Console\Commands\Email;
 use App\Services\Parser\ParseMailBox;
 use Illuminate\Console\Command;
 use App\Entity\Email\Message;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class ParseMailBoxCommand extends Command
 {
@@ -37,20 +39,8 @@ class ParseMailBoxCommand extends Command
     {
         parent::__construct();
 
-        Cache::tags([
-            'messages',
-            'emails',
-            'senders',
-            'ipAddress',
-            'regions',
-            'cities',
-            'providers',
-            'countries'
-        ])->flush();
-
         $this->service = $service;
         $this->foldersFromExchange = $this->service->getFoldersFromExchange(config('mail.ms_exchange_parse_folders'));
-        //dd($this->foldersFromExchange);
     }
 
     /**
@@ -58,68 +48,53 @@ class ParseMailBoxCommand extends Command
      */
     public function handle(): bool
     {
-
-        //0) если на почте существует первая папка из конфига, делаем из неё выборку, записываем в бд с меткой папки
-        //1) чекать последнюю запись
-        //2) определить к какой папке принадлежит
-        //3) проверить, есть ли такая папка  в файле конфига
-        //4) если есть - посчитать в бд кол-во записей
-        //с меткой этой папки, далее делаем выборку из почты от этого кол-ва в бд до шага, записываем в бд
-        //5) если папки в конфиге нет,
-
         $maxEntriesReturned = (int)config('mail.ms_exchange_count_parsing');
 
-        if ($maxEntriesReturned >= 150 || $maxEntriesReturned == 0) {
+        if ($maxEntriesReturned > 150 || $maxEntriesReturned == 0) {
             $this->error("Value MS_EXCHANGE_COUNT_PARSING must be from 1 to 150");
             return false;
         }
         // если таблица пустая - делаем первую выборку из почты, первой папки что указана в конфиге
         if (Message::count() == 0) {
-            $offset = 0;
-            $this->handleMessages($offset, $maxEntriesReturned, $this->foldersFromExchange[0]);
-            // иначе получаем кол-во строк в бд, после делаем выборку эт этого кол-ва с шагом в 1000
+            $this->handleMessages(0, $maxEntriesReturned, $this->foldersFromExchange[0]);
+            // иначе подсчитываем сколько в бд хранится по каждой папке записей.
         } else {
-            $lastFolderId = Message::orderByDesc('id')->first()->folder_id;
+            //$lastFolderId = Message::orderByDesc('id')->first()->folder_id;
 
-            //если айдишник папки последней записи есть в .env
-            $key = array_search($lastFolderId, array_column($this->foldersFromExchange, 'folder_id'));
-            if ($key !== false) {
-                $offset = Message::whereFolderId($lastFolderId)->count();
+            // извлекаем сгруппированный массив по папкам с количество в каждой
+            $foldersFromDb = Message::all()->groupBy('folder_id')->map(function ($t) {
+                /**@var Collection $t */
+                return $t->count();
+            })->toArray();
 
-                $result = $this->handleMessages($offset, $maxEntriesReturned, $this->foldersFromExchange[$key]);
-
-                //если по первой папке из .env данных в почте уже нет, идем в другую папку
-                if (!$result) {
-                    //если в .env есть другая папка
-                    if (isset($this->foldersFromExchange[$key + 1])) {
-                        // берем сделующую папку из .env, ищем по ней кол-во записей в бд, извлекаем
-                        // из почты, записываем в бд
-                        $nextFolder = $this->foldersFromExchange[$key + 1];
-
-
-                        //dd($nextFolder);
-                        $offset = Message::whereFolderId($nextFolder['folder_id'])->count();
-
-                        $result = $this->handleMessages($offset, $maxEntriesReturned, $nextFolder);
-                        if ($result) {
-                            return true;
-                        }
-                        //dd($this->foldersFromExchange[0]);
+            foreach ($this->foldersFromExchange as $folderFromExchange) {
+                //если в бд есть папка, которая указана в конфиге
+                if (array_key_exists($folderFromExchange['folder_id'], $foldersFromDb)) {
+                    //получаем кол-во писем в бд по этой папке
+                    $offset = $foldersFromDb[$folderFromExchange['folder_id']];
+                    //записываем в бд данные из нужной папки и нужным шагом
+                    if ($result = $this->handleMessages($offset, $maxEntriesReturned, $folderFromExchange)) {
+                        return true;
                     } else {
-                        $this->info("finish");
+                        continue;
+                    }
+                    //если в бд нет папки, которая указана в конфиге - записываем в бд данные по новой папке
+                } else {
+                    if ($result = $this->handleMessages(0, $maxEntriesReturned, $folderFromExchange)) {
+                        return true;
+                    //если данные в новой папке нет данных - следующая итерация цикла
+                    } else {
+                        continue;
                     }
                 }
-            } else {
-                $this->info('Не найдена папка, которая соответствует последней записи в бд!!!');
             }
+            //dd("finish");
         }
-
-        return true;
+        return false;
     }
 
     private function handleMessages(int $offset, int $maxEntriesReturned, array $folder): bool
     {
-
         // получаем айдишники сообщений из почты. Если выборка пустая, вернется пустой массив
         $messagesIds = $this->service->getMessagesIds($offset, $maxEntriesReturned, $folder);
 
@@ -129,23 +104,26 @@ class ParseMailBoxCommand extends Command
         }
 
         $dataFromDB = $this->service->getDataFromDb($messagesIds, $folder);
-        //dd($dataFromDB);
         $result = $this->service->insertToDatabase($dataFromDB);
-        //Cache::tags([
-        //    'messages',
-        //    'emails',
-        //    'senders',
-        //    'ipAddress',
-        //    'regions',
-        //    'cities',
-        //    'providers',
-        //    'countries'
-        //])->flush();
+        $this->clearCache();
 
         if ($result) {
             $this->info('Parsing of folder >> ' . $folder['name'] . ' <<. Parsing successfully completed. offset ' . $offset . ', max entries ' . $maxEntriesReturned . ', inserted rows - ' . count($dataFromDB) . '.');
         }
 
         return true;
+    }
+
+    private function clearCache()
+    {
+        Cache::tags([
+            'emails',
+            'senders',
+            'ipAddress',
+            'regions',
+            'cities',
+            'providers',
+            'countries'
+        ])->flush();
     }
 }

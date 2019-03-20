@@ -28,7 +28,8 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')
         //          ->hourly();
 
-        $schedule->command(ParseMailBoxCommand::class)->everyMinute();
+        $schedule->command(ParseMailBoxCommand::class)
+            ->everyTenMinutes();
     }
 
     /**
