@@ -10,6 +10,10 @@ use DateTime;
 
 class MessageController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:show-parser');
+    }
 
     /**
      * @param Request $request

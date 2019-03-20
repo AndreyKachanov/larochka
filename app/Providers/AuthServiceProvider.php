@@ -40,5 +40,8 @@ class AuthServiceProvider extends ServiceProvider
             return $user->isAdmin();
         });
 
+        Gate::define('show-parser', function (User $user) {
+            return $user->isAdmin();
+        });
     }
 }
