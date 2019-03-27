@@ -85,3 +85,13 @@ Breadcrumbs::register('cabinet.messages.index', function (Crumbs $crumbs) {
     $crumbs->parent('cabinet.home');
     $crumbs->push('Messages', route('cabinet.messages.index'));
 });
+
+// Chat
+Breadcrumbs::register('chat', function (Crumbs $crumbs) {
+    $crumbs->push('Chat', route('chat'));
+});
+
+//// Chat
+//Breadcrumbs::register('room', function (Crumbs $crumbs, $room) {
+//    $crumbs->push('Room' . $room, route('room'));
+//});

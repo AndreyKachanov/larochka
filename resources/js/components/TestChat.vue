@@ -17,12 +17,8 @@
 <script>
     export default {
         mounted() {
-            // window.Echo.channel('test')
-            //     .listen('PublicChat', (e) => {
-            //        console.log(e);
-            //     });
             window.Echo.private('test')
-                .listen('PublicChat', (e) => {
+                .listen('PrivateTest', (e) => {
                     console.log(e);
                 });
         }

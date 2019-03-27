@@ -3,7 +3,7 @@
 
 /**
  * A helper file for Laravel 5, to provide autocomplete information to your IDE
- * Generated for Laravel 5.8.4 on 2019-03-18 20:35:10.
+ * Generated for Laravel 5.8.4 on 2019-03-23 13:33:31.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *

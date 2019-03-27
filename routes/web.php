@@ -2,8 +2,11 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-//Route::get('/test', 'TestController@test')->name('test');
-//Route::get('/test2', 'TestController@test2')->name('test2');
+//Route::get('/test', function () {
+//    \App\Events\PublicChat::dispatch("get my message");
+//})->name('test');
+
+Route::get('/test', 'TestController@test')->name('test');
 //Route::get('/test3', 'TestController@test3')->name('test3');
 
 Route::get('/', 'HomeController@index')->name('home');
@@ -36,6 +39,7 @@ Route::group(
             Route::post('/phone/auth', 'PhoneController@auth')->name('phone.auth');
         });
         Route::resource('messages', 'MessageController')->only(['index']);
+        Route::resource('posts', 'VkontakteController')->only(['index']);
     }
 );
 
@@ -53,3 +57,18 @@ Route::group(
         Route::post('/users/{user}/verify', 'UsersController@verify')->name('users.verify');
     }
 );
+
+Route::post('messages', function (Illuminate\Http\Request $request) {
+    App\Events\PrivateChat::dispatch($request->all());
+});
+
+Route::get('/room/{room}', function (App\Entity\Chat\Room $room) {
+    return view('room', ['room' => $room]);
+})->middleware('auth')->name('room');
+
+//Route::get('/chat', function () {
+//    return view('chat');
+//})->name('chat');
+
+
+Route::view('/chat', 'chat')->name('chat');

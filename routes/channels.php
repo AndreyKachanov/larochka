@@ -1,16 +1,14 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Broadcast Channels
-|--------------------------------------------------------------------------
-|
-| Here you may register all of the event broadcasting channels that your
-| application supports. The given channel authorization callbacks are
-| used to check if an authenticated user can listen to the channel.
-|
-*/
+//Broadcast::channel('room.{room_id}', function ($user, $room_id) {
+//
+//    if ($user->rooms->contains($room_id)) {
+//        return $user->name;
+//    }
+//});
 
-Broadcast::channel('App.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+Broadcast::channel('test', function ($user) {
+
+    return $user->id === 4;
+    //return false;
 });

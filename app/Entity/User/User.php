@@ -2,13 +2,12 @@
 
 namespace App\Entity\User;
 
+use App\Entity\Chat\Room;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Str;
-
-
 
 /**
  * App\Entity\User\User
@@ -251,5 +250,8 @@ class User extends Authenticatable
         return !empty($this->name) && !empty($this->last_name) && $this->isPhoneVerified();
     }
 
-
+    public function rooms()
+    {
+        return $this->belongsToMany(Room::class);
+    }
 }
