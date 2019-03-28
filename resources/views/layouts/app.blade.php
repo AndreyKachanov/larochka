@@ -12,7 +12,6 @@
     <!-- Styles -->
     <link href="{{ mix('css/app.css', (config('app.env') == 'local') ? 'build' : '' ) }}" rel="stylesheet">
 
-
 </head>
 <body>
     <div id="app">

@@ -39,7 +39,9 @@ Route::group(
             Route::post('/phone/auth', 'PhoneController@auth')->name('phone.auth');
         });
         Route::resource('messages', 'MessageController')->only(['index']);
-        Route::resource('posts', 'VkontakteController')->only(['index']);
+        Route::resource('currencies', 'VkontakteController')->only(['index']);
+
+        Route::post('run_currencies', 'VkontakteController@run')->name('run_currencies');
     }
 );
 

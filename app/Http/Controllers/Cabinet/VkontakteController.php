@@ -21,7 +21,7 @@ class VkontakteController extends Controller
     {
         //$accessToken = config('vk.access_token');
         //$client = new Client();
-        //$request = "https://api.vk.com/method/wall.get?owner_id=-87785879&access_token=$accessToken&v=5.92&count=100";
+        //$request = "https://api.vk.com/method/wall.get?owner_id=-87785879&access_token=$accessToken&v=5.92&count=2";
         //
         //try {
         //    $response = $client->get($request)->getBody()->getContents();
@@ -35,10 +35,21 @@ class VkontakteController extends Controller
         //}
         //
         //$items = $json['response']['items'];
-        //
+        //dump($items);
+
         //foreach ($items as $item) {
         //    broadcast(new PrivateTest($item['text']));
         //}
+
+
+        return view('cabinet.currencies.index');
+    }
+
+    public function run(Request $request)
+    {
+
+        dd($request->all());
+        return response()->json($request->all());
     }
 
     /**
