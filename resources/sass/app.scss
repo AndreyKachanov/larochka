@@ -60,3 +60,10 @@ body {
 .table-messages td {
   font: 90% Helvetica, sans-serif;
 }
+
+
+.currencies {
+  .card-body {
+    min-height: 50vh;
+  }
+}

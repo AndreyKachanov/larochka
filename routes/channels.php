@@ -9,6 +9,6 @@
 
 Broadcast::channel('test', function ($user) {
 
-    return $user->id === 4;
+    return $user->id === 3;
     //return false;
 });

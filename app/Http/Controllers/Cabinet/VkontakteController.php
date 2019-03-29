@@ -47,9 +47,31 @@ class VkontakteController extends Controller
 
     public function run(Request $request)
     {
+        $accessToken = config('vk.access_token');
+        $client = new Client();
+        $request = "https://api.vk.com/method/wall.get?owner_id=-87785879&access_token=$accessToken&v=5.92&count=100";
 
-        dd($request->all());
-        return response()->json($request->all());
+        try {
+            $response = $client->get($request)->getBody()->getContents();
+            $json = json_decode($response, true);
+            if (isset($json['error'])) {
+                $error = $json['error'];
+                dd('Response vk. error_code -' . $error['error_code'] . ', error_msg - ' . $error['error_msg']);
+            }
+        } catch (Exception $e) {
+            dd("Error - " . $e->getMessage() . ', line - ' . $e->getLine() . ' File - ' . $e->getFile());
+        }
+
+
+        $items = $json['response']['items'];
+        $allowKeys = ['date' => '', 'from_id' => '', 'text' => ''];
+
+        foreach ($items as $item) {
+            $data = array_intersect_key($item, $allowKeys);
+            broadcast(new PrivateTest($data));
+        }
+
+        return response()->json([]);
     }
 
     /**
