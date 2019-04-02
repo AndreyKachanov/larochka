@@ -53,7 +53,7 @@ class ParseVkontakteMoneyCommand extends Command
             }
         } else {
             $this->info('empty parsing_currency_exchange key in cache');
+            return false;
         }
-        return false;
     }
 }
