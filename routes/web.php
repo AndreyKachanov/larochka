@@ -39,10 +39,10 @@ Route::group(
             Route::post('/phone/auth', 'PhoneController@auth')->name('phone.auth');
         });
         Route::resource('messages', 'MessageController')->only(['index']);
-        Route::resource('currencies', 'VkontakteController')->only(['index']);
+        Route::resource('currencies', 'VkParsingPostsController')->only(['index']);
 
-        Route::post('run_currencies', 'VkontakteController@run')->name('run_currencies');
-        Route::post('stop_currencies', 'VkontakteController@stop')->name('stop_currencies');
+        Route::post('run_currencies', 'VkParsingPostsController@run')->name('run_currencies');
+        Route::post('stop_currencies', 'VkParsingPostsController@stop')->name('stop_currencies');
     }
 );
 

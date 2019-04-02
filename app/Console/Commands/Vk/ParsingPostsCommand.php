@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands\Vk;
 
-use App\Jobs\CurrencyEchange;
+use App\Jobs\Vk\ParsingPosts;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
-class ParseVkGroupsCommand extends Command
+class ParsingPostsCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -20,7 +20,7 @@ class ParseVkGroupsCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Parse groups from vk.com';
+    protected $description = 'Parsing posts of vk.com groups';
 
     /**
      * Create a new command instance.
@@ -49,10 +49,10 @@ class ParseVkGroupsCommand extends Command
             return false;
         }
 
-        dd($arrFromCache);
-        //CurrencyEchange::dispatch(array_key_first($arr), $arr[array_key_first($arr)])->delay(Carbon::now()->addSecond(3));
+        //ParsingPosts::dispatch(array_key_first($arr), $arr[array_key_first($arr)])->delay(Carbon::now()->addSecond(3));
+        //dd($arrFromCache);
         foreach ($arrFromCache as $key => $value) {
-            CurrencyEchange::dispatch($key, $value);
+            ParsingPosts::dispatch($key, $value);
         }
         return true;
     }

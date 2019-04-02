@@ -3,25 +3,18 @@
 namespace App\Http\Controllers\Cabinet;
 
 use App\Entity\Vkontakte\Post;
-use App\Events\PrivateTest;
-use App\Events\PublicChat;
-use App\Jobs\CurrencyEchange;
-use App\Services\Vkontakte\ParseVkPosts;
-use Carbon\Carbon;
-use GuzzleHttp\Client;
+use App\Services\Vk\ParsingPostsService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Exception;
 use Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
-class VkontakteController extends Controller
+class VkParsingPostsController extends Controller
 {
 
     private $service;
 
-    public function __construct(ParseVkPosts $service)
+    public function __construct(ParsingPostsService $service)
     {
         $this->middleware('can:vk-parser');
         $this->service = $service;

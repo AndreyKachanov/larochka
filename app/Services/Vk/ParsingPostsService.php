@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services\Vkontakte;
+namespace App\Services\Vk;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 
-class ParseVkPosts
+class ParsingPostsService
 {
     private $client;
     private $accessToken;
