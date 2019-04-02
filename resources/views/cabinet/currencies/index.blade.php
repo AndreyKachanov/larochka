@@ -12,7 +12,7 @@
             <div class="card-header">Search for a favorable exchange rate</div>
             <div class="card-body">
                 <currencies></currencies>
-                <currencies-table></currencies-table>
+                <currencies-table :user="{{Auth::user()}}"></currencies-table>
             </div>
         </div>
     </div>

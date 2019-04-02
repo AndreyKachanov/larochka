@@ -39,8 +39,8 @@ class ParseMailBoxCommand extends Command
     {
         parent::__construct();
 
-        //$this->service = $service;
-        //$this->foldersFromExchange = $this->service->getFoldersFromExchange(config('mail.ms_exchange_parse_folders'));
+        $this->service = $service;
+        $this->foldersFromExchange = $this->service->getFoldersFromExchange(config('mail.ms_exchange_parse_folders'));
     }
 
     /**

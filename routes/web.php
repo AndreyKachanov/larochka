@@ -42,6 +42,7 @@ Route::group(
         Route::resource('currencies', 'VkontakteController')->only(['index']);
 
         Route::post('run_currencies', 'VkontakteController@run')->name('run_currencies');
+        Route::post('stop_currencies', 'VkontakteController@stop')->name('stop_currencies');
     }
 );
 

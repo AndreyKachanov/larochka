@@ -15,14 +15,16 @@ class PrivateTest implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $post;
+    public $userId;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($post)
+    public function __construct($post, $userId)
     {
         $this->post = $post;
+        $this->userId = $userId;
     }
 
     /**
@@ -32,6 +34,6 @@ class PrivateTest implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('test');
+        return new PrivateChannel('room.' . $this->userId);
     }
 }

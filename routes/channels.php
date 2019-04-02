@@ -7,8 +7,8 @@
 //    }
 //});
 
-Broadcast::channel('test', function ($user) {
-
-    return $user->id === 3;
-    //return false;
+Broadcast::channel('room.{room_id}', function ($user, $room_id) {
+    return (int)$user->id === (int)$room_id;
+    //return $user->id === 3 || $user->id === 4;
+    //return true;
 });

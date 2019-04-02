@@ -5,73 +5,70 @@ namespace App\Http\Controllers\Cabinet;
 use App\Entity\Vkontakte\Post;
 use App\Events\PrivateTest;
 use App\Events\PublicChat;
+use App\Jobs\CurrencyEchange;
+use App\Services\Vkontakte\ParseVkPosts;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Exception;
+use Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class VkontakteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
+    private $service;
+
+    public function __construct(ParseVkPosts $service)
+    {
+        $this->middleware('can:show-money');
+        $this->service = $service;
+    }
+
     public function index()
     {
-        //$accessToken = config('vk.access_token');
-        //$client = new Client();
-        //$request = "https://api.vk.com/method/wall.get?owner_id=-87785879&access_token=$accessToken&v=5.92&count=2";
-        //
-        //try {
-        //    $response = $client->get($request)->getBody()->getContents();
-        //    $json = json_decode($response, true);
-        //    if (isset($json['error'])) {
-        //        $error = $json['error'];
-        //        dd('Response vk. error_code -' . $error['error_code'] . ', error_msg - ' . $error['error_msg']);
-        //    }
-        //} catch (Exception $e) {
-        //    dd("Error - " . $e->getMessage() . ', line - ' . $e->getLine() . ' File - ' . $e->getFile());
-        //}
-        //
-        //$items = $json['response']['items'];
-        //dump($items);
-
-        //foreach ($items as $item) {
-        //    broadcast(new PrivateTest($item['text']));
-        //}
-
-
         return view('cabinet.currencies.index');
     }
 
     public function run(Request $request)
     {
-        $accessToken = config('vk.access_token');
-        $client = new Client();
-        $request = "https://api.vk.com/method/wall.get?owner_id=-87785879&access_token=$accessToken&v=5.92&count=100";
 
-        try {
-            $response = $client->get($request)->getBody()->getContents();
-            $json = json_decode($response, true);
-            if (isset($json['error'])) {
-                $error = $json['error'];
-                dd('Response vk. error_code -' . $error['error_code'] . ', error_msg - ' . $error['error_msg']);
-            }
-        } catch (Exception $e) {
-            dd("Error - " . $e->getMessage() . ', line - ' . $e->getLine() . ' File - ' . $e->getFile());
+        $groupsFromUser = $request->get('groups');
+        $keywords = $request->get('keywords');
+
+        //проверка, передали ли с фронта какие-то группы
+        if ($groupsFromUser === null || count($groupsFromUser) === 0) {
+            return response()->json('not found vk group || vkgroups = []');
         }
 
-
-        $items = $json['response']['items'];
-        $allowKeys = ['date' => '', 'from_id' => '', 'text' => ''];
-
-        foreach ($items as $item) {
-            $data = array_intersect_key($item, $allowKeys);
-            broadcast(new PrivateTest($data));
+        //проверка, передали ли с фронта ключевые слова
+        if ($keywords === null || $keywords === '') {
+            return response()->json('not found keywords');
         }
 
-        return response()->json([]);
+        $groupsFromVk = $this->service->getGroups($groupsFromUser);
+        //dd($groupsFromVk);
+
+        if (empty($groupsFromVk)) {
+            return response()->json('из фронта передали не существующие группы');
+        }
+
+        $userId = Auth::user()->id;
+        $this->service->setParsingDataFromUser($userId, $groupsFromVk, $keywords);
+
+        dd(Cache::get('parsing_currency_exchange'));
+
+        return response()->json(Cache::get('parsing_currency_exchange'));
+    }
+
+    public function stop()
+    {
+        $userId = Auth::user()->id;
+        $this->service->stopParsingFromUser($userId);
+        dd(Cache::get('parsing_currency_exchange'));
+        return response()->json(Cache::get('parsing_currency_exchange'));
     }
 
     /**

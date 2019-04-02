@@ -1,41 +1,36 @@
 <template>
     <div class="row groups-block">
-        <div v-if="errors.length" class="col-12 error">
+        <div v-if="errors.length" class="alert alert-danger alert-block col-12">
             <p class="text-sm-center" v-for="error in errors">{{ error }}</p>
         </div>
-        <div class="col-sm-7">
-            <label for="vk_group" class="col-form-label col-12 main-label">Vk group name:</label>
-            <div v-for="(user, index) in users" style="display: flex">
-                <input type="text" v-model="user.name" class="form-control col-5" id="vk_group" required>
+        <div v-if="parsing_start" class="alert alert-success alert-block col-12">
+            <p class="text-sm-center" >Parsing start!</p>
+        </div>
+        <div class="col-12 empty-col"></div>
+        <div class="col-12">
+            <label for="vk_group" class="col-form-label main-label col-4">Vk group name:</label>
+            <label for="keywords" class="col-form-label col-4">Keywords (comma separated):</label>
+        </div>
+
+        <div class="col-sm-4">
+            <div v-for="(group, index) in groups" class="input-block">
+                <input type="text" v-model="group.name" class="form-control" id="vk_group" v-bind:tabindex="index+1" :disabled="parsing_start ? true : false">
                 <button @click="deleteUser(index)" class="btn">
                     <i class="fa fa-remove" aria-hidden="true"></i>
                 </button>
             </div>
-
-            <button @click="addUser" class="btn btn-success btn-sm">
+            <button @click="addUser" class="btn btn-success btn-sm" :disabled="parsing_start ? true : false">
                 Add Group
             </button>
-
         </div>
-
         <div class="col-sm-4">
-            <div class="form-group">
-                <button @click="run" class="btn btn-primary">Search</button>
-            </div>
+            <input class="form-control" type="text" id="keywords" v-model="keywords">
         </div>
-        <!--<table class="table table-striped table-messages">-->
-            <!--<thead>-->
-            <!--<tr class="d-flex">-->
-                <!--<th class="col-1">Date</th>-->
-                <!--<th class="col-2">Post</th>-->
-                <!--<th class="col-2">Author</th>-->
-            <!--</tr>-->
-            <!--</thead>-->
-            <!--<tbody>-->
+        <div class="col-sm-4">
+            <button @click="run" class="btn btn-primary">Start parsing</button>
+            <button @click="stop" class="btn btn-primary">Stop</button>
+        </div>
 
-            <!--</tbody>-->
-        <!--</table>-->
-        <!--<pre>{{ $data }}</pre>-->
     </div>
 </template>
 
@@ -44,39 +39,59 @@
         name: "Currencies",
         data: function () {
             return {
-                users: [{name: 'obmenvalut_donetsk'}],
+                groups: [{name: 'obmenvalut_donetsk'}, {name: 'obmen_valut_donetsk'}, {name: 'donfinance'}, {name: 'donetsk'}],
                 errors: [],
-                error_msg: 'The vk group name is required.',
+                error_msg: 'The vk group name and keywords is required.',
+                parsing_start: false,
+                keywords: 'куплю безнал, куплю бн, безнал, куплю'
             };
         },
         methods: {
             run() {
                 let items = [];
-                items = this.users.map(
-                    function (user) {
-                        return user.name;
+                items = this.groups.map(
+                    function (group) {
+                        return group.name;
                     }
                 );
+
+                if (this.keywords === '') {
+                    this.errors.push(this.error_msg);
+                    return false;
+                }
 
                 if (items.indexOf('') !== -1) {
                     if (this.errors.indexOf(this.error_msg)) {
                         this.errors.push(this.error_msg);
                         return false;
                     }
+
+
+
                 } else {
-                    axios.post('/cabinet/run_currencies', this.users).then((response) => {
+                    this.parsing_start = true;
+                    console.log(this.keywords);
+                    axios.post('/cabinet/run_currencies', {'groups':this.groups, 'keywords':this.keywords}).then((response) => {
                         // console.log(response.data);
                     }).catch(function (error) {
                         console.log(error);
                     });
                 }
             },
+            stop() {
+                axios.post('/cabinet/stop_currencies').then((response) => {
+                    // console.log(response.data);
+                }).catch(function (error) {
+                    console.log(error);
+                });
+
+            },
             addUser: function () {
-                this.users.push({name: ''});
+                this.groups.push({name: ''});
             },
             deleteUser: function (index) {
-                console.log(index);
-                this.users.splice(index, 1);
+                // console.log(index);
+                this.groups.splice(index, 1);
                 if (index === 0)
                     this.addUser()
             }
@@ -87,14 +102,17 @@
 <style lang="scss" scoped>
 
     .groups-block {
-        padding-top: 40px;
-        /*min-height: 50vh;*/
-        .error {
+        .alert-block {
+            padding: 0.4rem 0.8rem;
             position: absolute;
-            top: 66px;
+            width: 99%;
+            top: 57px;
             p {
-                color: red;
+                margin-bottom: 0;
             }
+        }
+        .empty-col {
+            margin-top: 35px;
         }
         .main-label {
             padding: 0;
@@ -107,6 +125,13 @@
 
         button.btn:focus {
             box-shadow: none;
+        }
+
+        .input-block {
+            display: flex;
+            button {
+                margin-bottom: 7px;
+            }
         }
     }
 
