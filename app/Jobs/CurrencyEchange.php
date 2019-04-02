@@ -16,7 +16,6 @@ class CurrencyEchange implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    //public $tries = 1;
     public $userId;
     public $parsingData;
 

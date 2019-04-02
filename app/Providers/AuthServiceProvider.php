@@ -43,7 +43,7 @@ class AuthServiceProvider extends ServiceProvider
             return $user->isAdmin();
         });
 
-        Gate::define('show-money', function (User $user) {
+        Gate::define('vk-parser', function (User $user) {
             return $user->isAdmin();
         });
     }

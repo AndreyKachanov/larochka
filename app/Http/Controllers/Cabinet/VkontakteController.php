@@ -23,7 +23,7 @@ class VkontakteController extends Controller
 
     public function __construct(ParseVkPosts $service)
     {
-        $this->middleware('can:show-money');
+        $this->middleware('can:vk-parser');
         $this->service = $service;
     }
 
@@ -58,17 +58,17 @@ class VkontakteController extends Controller
         $userId = Auth::user()->id;
         $this->service->setParsingDataFromUser($userId, $groupsFromVk, $keywords);
 
-        dd(Cache::get('parsing_currency_exchange'));
+        dd(Cache::get('parsing_vk_groups'));
 
-        return response()->json(Cache::get('parsing_currency_exchange'));
+        return response()->json(Cache::get('parsing_vk_groups'));
     }
 
     public function stop()
     {
         $userId = Auth::user()->id;
         $this->service->stopParsingFromUser($userId);
-        dd(Cache::get('parsing_currency_exchange'));
-        return response()->json(Cache::get('parsing_currency_exchange'));
+        dd(Cache::get('parsing_vk_groups'));
+        return response()->json(Cache::get('parsing_vk_groups'));
     }
 
     /**

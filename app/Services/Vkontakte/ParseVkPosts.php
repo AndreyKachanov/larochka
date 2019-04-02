@@ -18,14 +18,14 @@ class ParseVkPosts
 
     public function setParsingDataFromUser($userId, $groupsFromVk, $keywords): void
     {
-        //Cache::forget('parsing_currency_exchange');
+        //Cache::forget('parsing_vk_groups');
         //dd();
 
         //$keywords = explode(',', $keywords);
         $keywords = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', $keywords);
 
-        if (Cache::has('parsing_currency_exchange')) {
-            $arr = Cache::get('parsing_currency_exchange');
+        if (Cache::has('parsing_vk_groups')) {
+            $arr = Cache::get('parsing_vk_groups');
             $arr[$userId] = [
                 'groups' => $groupsFromVk,
                 'keywords' => $keywords
@@ -38,15 +38,15 @@ class ParseVkPosts
                 ]
             ];
         }
-        Cache::forever('parsing_currency_exchange', $arr);
+        Cache::forever('parsing_vk_groups', $arr);
     }
 
     public function stopParsingFromUser($userId): void
     {
-        if (Cache::has('parsing_currency_exchange')) {
-            $arrFromCache = Cache::get('parsing_currency_exchange');
+        if (Cache::has('parsing_vk_groups')) {
+            $arrFromCache = Cache::get('parsing_vk_groups');
             unset($arrFromCache[$userId]);
-            Cache::forever('parsing_currency_exchange', $arrFromCache);
+            Cache::forever('parsing_vk_groups', $arrFromCache);
         }
     }
 

@@ -3,7 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\Email\ParseMailBoxCommand;
-use App\Console\Commands\Vk\ParseVkontakteMoneyCommand;
+use App\Console\Commands\Vk\ParseVkGroupsCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
         $schedule->command(ParseMailBoxCommand::class)
             ->everyTenMinutes();
 
-        $schedule->command(ParseVkontakteMoneyCommand::class)
+        $schedule->command(ParseVkGroupsCommand::class)
             ->everyMinute();
     }
 
