@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Cabinet;
 
 use App\Entity\Vkontakte\Post;
+use App\Http\Requests\Cabinet\ParsingVkPostsRequest;
 use App\Services\Vk\ParsingPostsService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -25,28 +26,11 @@ class VkParsingPostsController extends Controller
         return view('cabinet.currencies.index');
     }
 
-    public function run(Request $request)
+    public function startParse(ParsingVkPostsRequest $request)
     {
-
         $groupsFromUser = $request->get('groups');
         $keywords = $request->get('keywords');
-
-        //проверка, передали ли с фронта какие-то группы
-        if ($groupsFromUser === null || count($groupsFromUser) === 0) {
-            return response()->json('not found vk group || vkgroups = []');
-        }
-
-        //проверка, передали ли с фронта ключевые слова
-        if ($keywords === null || $keywords === '') {
-            return response()->json('not found keywords');
-        }
-
         $groupsFromVk = $this->service->getGroups($groupsFromUser);
-        //dd($groupsFromVk);
-
-        if (empty($groupsFromVk)) {
-            return response()->json('из фронта передали не существующие группы');
-        }
 
         $userId = Auth::user()->id;
         $this->service->setParsingDataFromUser($userId, $groupsFromVk, $keywords);
@@ -56,7 +40,7 @@ class VkParsingPostsController extends Controller
         return response()->json(Cache::get('parsing_vk_groups'));
     }
 
-    public function stop()
+    public function stopParse()
     {
         $userId = Auth::user()->id;
         $this->service->stopParsingFromUser($userId);

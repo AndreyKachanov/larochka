@@ -4,6 +4,7 @@ namespace App\Services\Vk;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
+use Exception;
 
 class ParsingPostsService
 {
@@ -16,24 +17,65 @@ class ParsingPostsService
         $this->accessToken = config('vk.access_token');
     }
 
+    public function checkGroup(string $group): bool
+    {
+        $request = sprintf(
+            'https://api.vk.com/method/resolveScreenName?screen_name=%s&access_token=%s&v=5.92',
+            $group,
+            $this->accessToken
+        );
+
+        $json = $this->getResponseByGuzzleClient($request);
+        //если вернулся какой-то ответ
+        if (!empty($json['response'])) {
+            return $json['response']['type'] === 'group';
+        }
+
+        return false;
+    }
+
+    public function getGroups(array $vkGroups): array
+    {
+        $arr = [];
+        foreach ($vkGroups as $group) {
+            $request = sprintf(
+                'https://api.vk.com/method/resolveScreenName?screen_name=%s&access_token=%s&v=5.92',
+                $group['name'],
+                $this->accessToken
+            );
+
+            $json = $this->getResponseByGuzzleClient($request);
+
+            //если вернулся какой-то ответ
+            if (!empty($json['response'])) {
+                //если в ответе есть группы
+                if ($json['response']['type'] === 'group') {
+                    $arr[] = [
+                        'name' => $group['name'],
+                        'id'   => $json['response']['object_id']
+                    ];
+                }
+            }
+        }
+        return $arr;
+    }
+
     public function setParsingDataFromUser($userId, $groupsFromVk, $keywords): void
     {
         //Cache::forget('parsing_vk_groups');
         //dd();
-
-        //$keywords = explode(',', $keywords);
         $keywords = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', $keywords);
 
         if (Cache::has('parsing_vk_groups')) {
             $arr = Cache::get('parsing_vk_groups');
             $arr[$userId] = [
-                'groups' => $groupsFromVk,
+                'groups'   => $groupsFromVk,
                 'keywords' => $keywords
             ];
         } else {
             $arr = [
                 $userId => [
-                    'groups' => $groupsFromVk,
+                    'groups'   => $groupsFromVk,
                     'keywords' => $keywords
                 ]
             ];
@@ -50,34 +92,32 @@ class ParsingPostsService
         }
     }
 
-    public function getGroups(array $vkGroups): array
+    private function getResponseByGuzzleClient(string $request): array
     {
-        $arr = [];
-        foreach ($vkGroups as $group) {
-            $groupName = $group['name'];
-            $client = new Client();
-            $request = "https://api.vk.com/method/resolveScreenName?screen_name=$groupName&access_token=$this->accessToken&v=5.92";
-
-            try {
-                $response = $client->get($request)->getBody()->getContents();
-                $json = json_decode($response, true);
-                if (isset($json['error'])) {
-                    $error = $json['error'];
-                    dd('Response vk. error_code -' . $error['error_code'] . ', error_msg - ' . $error['error_msg']);
-                }
-            } catch (\Exception $e) {
-                dd("Error - " . $e->getMessage() . ', line - ' . $e->getLine() . ' File - ' . $e->getFile());
+        try {
+            $response = $this->client->get($request)->getBody()->getContents();
+            //$response = $this->client->get($request)->getBody()->getContents();
+            $json = json_decode($response, true);
+            //если запрос прошел удачно, но вк вернул ошибку - останавливаем и выводим
+            if (isset($json['error'])) {
+                $error = $json['error'];
+                $errorMsg = sprintf(
+                    'Response vk has error. Error code - %d, error msg - %s',
+                    $error['error_code'],
+                    $error['error_msg']
+                );
+                dd($errorMsg);
             }
-
-            if (!empty($json['response'])) {
-                if ($json['response']['type'] == 'group') {
-                    $arr[] = [
-                        'name' => $groupName,
-                        'id' => $json['response']['object_id']
-                    ];
-                }
-            }
+        } catch (Exception $e) {
+            $errorMsg = sprintf(
+                'Error during Guzzle request. %s. Line - %d. File - %s. (ParsingPostsService.php, 60+ line)',
+                $e->getMessage(),
+                $e->getLine(),
+                $e->getFile()
+            );
+            dd($errorMsg);
         }
-        return $arr;
+        return $json;
     }
 }
+
