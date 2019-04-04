@@ -2,14 +2,16 @@
 
 namespace App\Services\Vk;
 
+use Carbon\Carbon;
 use GuzzleHttp\Client;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Exception;
 
 class ParsingPostsService
 {
     private $client;
-    private $accessToken;
+    public $accessToken;
 
     public function __construct(Client $client)
     {
@@ -62,10 +64,7 @@ class ParsingPostsService
 
     public function setParsingDataFromUser($userId, $groupsFromVk, $keywords): void
     {
-        //Cache::forget('parsing_vk_groups');
-        //dd();
         $keywords = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', $keywords);
-
         if (Cache::has('parsing_vk_groups')) {
             $arr = Cache::get('parsing_vk_groups');
             $arr[$userId] = [
@@ -92,11 +91,58 @@ class ParsingPostsService
         }
     }
 
+    public function getPosts(array $parsingData): Collection
+    {
+        $data = [];
+        foreach ($parsingData['groups'] as $group) {
+            $request = sprintf(
+                'https://api.vk.com/method/wall.search?owner_id=-%d&query=%s&access_token=%s&v=5.58&extended=1&count=100',
+                $group['id'],
+                implode(',', $parsingData['keywords']),
+                $this->accessToken
+            );
+            $json = $this->getResponseByGuzzleClient($request);
+            if ($json['response']['count'] > 0) {
+                $items = $json['response']['items'];
+                $profiles = $json['response']['profiles'];
+                $groups = $json['response']['groups'];
+                foreach ($items as $item) {
+                    //ищем в массиве профайлов нужного юзера
+                    $profile = array_filter($profiles, function ($arr) use ($item) {
+                        return $arr['id'] === $item['from_id'];
+                    });
+                    $profile = array_shift($profile);
+                    $responseGroup = array_filter($groups, function ($arr) use ($item) {
+                        return $arr['id'] === -$item['owner_id'];
+                    });
+                    $responseGroup = array_shift($responseGroup);
+                    $temp['group_screen_name'] = $group['name'] ?? null;
+                    $temp['first_name'] = $profile['first_name'] ?? null;
+                    $temp['last_name'] = $profile['last_name'] ?? null;
+                    $temp['screen_name'] = $profile['screen_name'] ?? null;
+                    $temp['id'] = $item['id'] ?? null;
+                    $temp['group_id'] = $item['from_id'] ?? null;
+                    $temp['user_src'] = 'https://vk.com/id' . $profile['id'];
+                    $temp['date'] = $item['date'] ?? null;
+                    $temp['text'] = (iconv_strlen($item['text']) < 1000
+                            ? $item['text']
+                            : 'post > 1000 symbols')
+                        ?? null;
+                    $temp['photo_50'] = $profile['photo_50'] ?? null;
+                    $temp['group_photo_50'] = $responseGroup['photo_50'] ?? null;
+                    $temp['group_src'] = 'https://vk.com/' . $responseGroup['screen_name'];
+                    $temp['group_name'] = $responseGroup['name'];
+                    $data[] = $temp;
+                }
+            }
+        }
+        return collect($data);
+    }
+
     private function getResponseByGuzzleClient(string $request): array
     {
         try {
             $response = $this->client->get($request)->getBody()->getContents();
-            //$response = $this->client->get($request)->getBody()->getContents();
             $json = json_decode($response, true);
             //если запрос прошел удачно, но вк вернул ошибку - останавливаем и выводим
             if (isset($json['error'])) {
@@ -120,4 +166,3 @@ class ParsingPostsService
         return $json;
     }
 }
-

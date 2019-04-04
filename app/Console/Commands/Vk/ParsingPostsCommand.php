@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Vk;
 
 use App\Jobs\Vk\ParsingPosts;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
@@ -49,10 +50,9 @@ class ParsingPostsCommand extends Command
             return false;
         }
 
-        //ParsingPosts::dispatch(array_key_first($arr), $arr[array_key_first($arr)])->delay(Carbon::now()->addSecond(3));
-        //dd($arrFromCache);
+//ParsingPosts::dispatch(array_key_first($arr), $arr[array_key_first($arr)])->delay(Carbon::now()->addSecond(3));
         foreach ($arrFromCache as $key => $value) {
-            ParsingPosts::dispatch($key, $value);
+            ParsingPosts::dispatch($key, $value)->delay(Carbon::now()->addSecond(2));
         }
         return true;
     }

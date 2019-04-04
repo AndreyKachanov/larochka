@@ -102,7 +102,6 @@
                 axios.post(this.route_stop_parse).then((response) => {
                     console.log(response.data);
                 // }).catch(function (error) {
-                    console.log(error.response.data.message);
                 });
 
             },
