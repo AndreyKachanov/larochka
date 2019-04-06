@@ -1,12 +1,8 @@
 <template>
     <div class="row groups-block">
 
-        <!--<div v-if="errors.length" class="alert alert-danger alert-block col-12">-->
-            <!--<p class="text-sm-center" v-for="error in errors">{{ error }}</p>-->
-        <!--</div>-->
-
-        <div v-if="feedback" class="alert alert-danger alert-block col-12">
-            <p  class="text-sm-center" v-text="feedback"></p>
+        <div v-if="errors.length" class="alert alert-danger alert-block col-12">
+            <p class="text-sm-center" v-for="error in errors">{{ error }}</p>
         </div>
 
         <div v-if="parsing_start" class="alert alert-success alert-block col-12">
@@ -15,23 +11,25 @@
         <div class="col-12 empty-col"></div>
         <div class="col-12">
             <label for="vk_group" class="col-form-label main-label col-4">Vk group name:</label>
-            <label for="keywords" class="col-form-label col-5">Keywords. Words or numbers (comma separated):</label>
+            <label for="keywords" class="col-form-label col-5">Keywords (words or numbers, comma separated):</label>
         </div>
 
         <div class="col-sm-4">
             <div v-for="(group, index) in groups" class="input-block">
-                <input type="text" v-model="group.name" name="groups[]" class="form-control" id="vk_group" v-bind:tabindex="index+1"
+                <input type="text" v-model="group.name" name="groups[]"  :class="[  errors['groups.' + index + '.name'] ? 'is-invalid' : '', 'form-control' ]" id="vk_group" v-bind:tabindex="index+1"
                        :disabled="parsing_start ? true : false">
                 <button @click="deleteUser(index)" class="btn">
                     <i class="fa fa-remove" aria-hidden="true"></i>
                 </button>
+                <div v-for="(error) in errors['groups.' + index + '.name']" class="invalid-feedback">{{ error }}</div>
             </div>
-            <button @click="addUser" class="btn btn-success btn-sm" :disabled="parsing_start ? true : false">
+            <button @click="addGroup" class="btn btn-success btn-sm btn-add-group" :disabled="parsing_start ? true : false">
                 Add Group
             </button>
         </div>
         <div class="col-sm-4">
-            <input class="form-control" type="text" id="keywords" v-model="keywords" name="keywords">
+            <input :class="[ errors.keywords ? 'is-invalid' : '', 'form-control' ]" type="text" id="keywords" v-model="keywords" name="keywords">
+            <div v-for="(error) in errors.keywords" class="invalid-feedback">{{ error }}</div>
         </div>
         <div class="col-sm-4">
             <button @click="start" class="btn btn-primary">Start parsing</button>
@@ -49,10 +47,8 @@
             return {
                 groups: [{name: 'obmenvalut_donetsk'}, {name: 'obmen_valut_donetsk'}, {name: 'donfinance'}, {name: 'donetsk'}],
                 errors: [],
-                error_msg: 'The vk group name and keywords is required.',
                 parsing_start: false,
-                keywords: 'куплю безнал, куплю бн, безнал, куплю',
-                feedback: "",
+                keywords: 'куплю безнал',
             };
         },
         methods: {
@@ -61,58 +57,25 @@
                     'groups': this.groups,
                     'keywords': this.keywords
                 }).then((response) => {
-                    // console.log(response);
+                    this.errors = [];
                 }).catch(error => {
-                    this.feedback = error.response.data.errors;
+                    this.errors = error.response.data.errors;
+                    // console.log(this.errors);
                 });
-
-                // let items = [];
-                // items = this.groups.map(
-                //     function (group) {
-                //         return group.name;
-                //     }
-                // );
-                //
-                // if (this.keywords === '') {
-                //     this.errors.push(this.error_msg);
-                //     return false;
-                // }
-                //
-                // if (items.indexOf('') !== -1) {
-                //     if (this.errors.indexOf(this.error_msg)) {
-                //         this.errors.push(this.error_msg);
-                //         return false;
-                //     }
-                //
-                //
-                // } else {
-                //     this.parsing_start = true;
-                //     // console.log(this.keywords);
-                //     axios.post(this.route_start_parse, {
-                //         'groups': this.groups,
-                //         'keywords': this.keywords
-                //     }).then((response) => {
-                //         // console.log(response.data);
-                //     }).catch(function (error) {
-                //         console.log(error);
-                //     });
-                // }
             },
             stop() {
                 axios.post(this.route_stop_parse).then((response) => {
                     console.log(response.data);
-                // }).catch(function (error) {
                 });
 
             },
-            addUser: function () {
+            addGroup: function () {
                 this.groups.push({name: ''});
             },
             deleteUser: function (index) {
-                // console.log(index);
                 this.groups.splice(index, 1);
-                if (index === 0)
-                    this.addUser()
+                // if (index === 0)
+                //     this.addGroup()
             }
         }
     }
@@ -139,7 +102,7 @@
         }
 
         input[type='text'] {
-            margin-bottom: 7px;
+            margin-top: 7px;
         }
 
         button.btn:focus {
@@ -148,10 +111,40 @@
 
         .input-block {
             display: flex;
+            flex-wrap: wrap;
+            /*justify-content: center;*/
+            /*flex-direction: column;*/
             button {
-                margin-bottom: 7px;
+                flex-basis: 15%;
+                flex-grow: 0;
+                /*margin-bottom: 7px;*/
             }
+            input[type='text'] {
+                flex-grow: 1;
+                flex-basis: 80%;
+
+            }
+            .invalid-feedback {
+                flex-grow: 1;
+            }
+            .form-control.is-invalid {
+
+            }
+            /*> * {*/
+                /*flex-grow: 1;*/
+            /*}*/
+
         }
+
+        .btn-add-group {
+            margin-top: 10px;
+        }
+
+        .form-control {
+            background-image: none;
+            padding: 0.375rem 0.75rem;
+        }
+
     }
 
 </style>
