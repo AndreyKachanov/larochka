@@ -2,6 +2,7 @@
 
 namespace App\Services\Vk;
 
+use App\Events\PrivateTest;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
@@ -62,27 +63,74 @@ class ParsingPostsService
         return $arr;
     }
 
-    public function setParsingDataFromUser($userId, $groupsFromVk, $keywords): void
+    public function setParsingDataFromUser(int $userId, array $groupsFromVk, string $keywords, int $days): void
     {
         $keywords = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', $keywords);
         if (Cache::has('parsing_vk_groups')) {
             $arr = Cache::get('parsing_vk_groups');
             $arr[$userId] = [
                 'groups'   => $groupsFromVk,
-                'keywords' => $keywords
+                'keywords' => $keywords,
+                'days' => $days
             ];
         } else {
             $arr = [
                 $userId => [
                     'groups'   => $groupsFromVk,
-                    'keywords' => $keywords
+                    'keywords' => $keywords,
+                    'days' => $days
                 ]
             ];
         }
         Cache::forever('parsing_vk_groups', $arr);
     }
 
-    public function stopParsingFromUser($userId): void
+    public function setParsingDataFromUser2(int $userId, array $groupsFromVk, string $keywords, int $days): void
+    {
+        $keywords = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', $keywords);
+        if (Cache::has('parsing_vk_groups')) {
+            $arr = Cache::get('parsing_vk_groups');
+            $arr[$userId] = [
+                'groups'   => $groupsFromVk,
+                'keywords' => $keywords,
+                'days' => $days
+            ];
+        } else {
+            $arr = [
+                $userId => [
+                    'groups'   => $groupsFromVk,
+                    'keywords' => $keywords,
+                    'days' => $days
+                ]
+            ];
+        }
+        Cache::forever('parsing_vk_groups', $arr);
+    }
+
+    public function sendDataToPusher(int $userId, array $groupsFromVk, string $keywords, int $days): void
+    {
+        $arr = [
+            'user_id'  => $userId,
+            'groups'   => $groupsFromVk,
+            'keywords' => $keywords = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', $keywords),
+            'days'     => $days
+        ];
+
+        $moreThat = Carbon::now()->subDay($days)->timestamp;
+        $dataForPusher = $this->getPosts($arr)
+            ->where('date', '>=', $moreThat)
+            ->sortByDesc('date')
+            ->map(function ($item, $key) {
+                $item['date'] = Carbon::createFromTimestamp($item['date'])->addHour()->format('d.m.Y H:i:s');
+                return $item;
+            });
+
+        $dataForPusher->each(function ($item, $key) use ($userId) {
+            broadcast(new PrivateTest($item, $userId));
+        });
+    }
+
+    public function stopParsingFromUser(int $userId): void
     {
         if (Cache::has('parsing_vk_groups')) {
             $arrFromCache = Cache::get('parsing_vk_groups');

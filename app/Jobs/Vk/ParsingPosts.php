@@ -26,8 +26,11 @@ class ParsingPosts implements ShouldQueue
 
     public function handle(ParsingPostsService $service): void
     {
+        $moreThat = Carbon::now()->subDay($this->parsingData['days'])->timestamp;
+
         $dataForPusher = $service
             ->getPosts($this->parsingData)
+            ->where('date', '>=', $moreThat)
             ->sortByDesc('date')
             ->map(function ($item, $key) {
                 $item['date'] = Carbon::createFromTimestamp($item['date'])->addHour()->format('d.m.Y H:i:s');

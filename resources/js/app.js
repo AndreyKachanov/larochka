@@ -26,6 +26,7 @@ Vue.component('chat', require('./components/Chat.vue').default);
 Vue.component('private-chat', require('./components/PrivateChat.vue').default);
 Vue.component('test-chat', require('./components/TestChat.vue').default);
 Vue.component('currencies', require('./components/Currencies.vue').default);
+Vue.component('parser', require('./components/Parser.vue').default);
 Vue.component('currencies-table', require('./components/CurrenciesTable.vue').default);
 //
 // /**

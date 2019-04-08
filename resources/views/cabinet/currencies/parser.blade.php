@@ -12,12 +12,10 @@
             <div class="card-header">Search for a favorable exchange rate</div>
             <div class="card-body">
 
-                <currencies
+                <parser
                         route_start_parse="{{route('cabinet.parse')}}"
-                        {{--route_stop_parse="{{route('cabinet.stop_parse')}}"--}}
-                        :cache ="{{  json_encode($cache) }}"
                 >
-                </currencies>
+                </parser>
 
                 <currencies-table :user="{{Auth::user()}}"></currencies-table>
             </div>

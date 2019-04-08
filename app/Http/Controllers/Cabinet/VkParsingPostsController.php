@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Cache;
 
 class VkParsingPostsController extends Controller
 {
-
     private $service;
 
     public function __construct(ParsingPostsService $service)
@@ -23,17 +22,33 @@ class VkParsingPostsController extends Controller
 
     public function index()
     {
-        return view('cabinet.currencies.index');
+        return view('cabinet.currencies.parser');
+    }
+
+    public function parse(ParsingVkPostsRequest $request)
+    {
+        $groupsFromVk = $this->service->getGroups($request->get('groups'));
+
+        $this->service->sendDataToPusher(
+            Auth::user()->id,
+            $groupsFromVk,
+            $request->get('keywords'),
+            $request->get('days')
+        );
+
+        return response()->json('data sent');
     }
 
     public function startParse(ParsingVkPostsRequest $request)
     {
         $groupsFromUser = $request->get('groups');
         $keywords = $request->get('keywords');
+        $days = $request->get('days');
+
         $groupsFromVk = $this->service->getGroups($groupsFromUser);
 
         $userId = Auth::user()->id;
-        $this->service->setParsingDataFromUser($userId, $groupsFromVk, $keywords);
+        $this->service->setParsingDataFromUser($userId, $groupsFromVk, $keywords, $days);
 
         dd(Cache::get('parsing_vk_groups'));
 

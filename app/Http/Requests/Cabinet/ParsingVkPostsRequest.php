@@ -63,6 +63,12 @@ class ParsingVkPostsRequest extends FormRequest
                 'min:3',
                 'max:300',
                 'regex:/^[a-zA-Zа-яА-ЯёЁ0-9, ]*$/u'
+            ],
+            'days' => [
+                'required',
+                'numeric',
+                'min:1',
+                'max:1000'
             ]
         ];
     }
@@ -74,8 +80,7 @@ class ParsingVkPostsRequest extends FormRequest
         $attributesForGroups = $groupsRequest ? $this->setAttributesForGroups($groupsRequest, $groupsKeyName) : [];
 
         $attributes = [
-            'groups' => 'Vk group name',
-            'keywords' => 'Keywords'
+            'groups' => 'Vk group name'
         ];
 
         $attributes = array_merge($attributesForGroups, $attributes);

@@ -27,7 +27,6 @@
         <div class="col-sm-7 right-block">
             <img class="money-img" src="/assets/images/money.jpg" title="money">
             <button @click="start" class="btn btn-danger">Start parse</button>
-            <!--<button @click="stop" class="btn btn-primary">Stop</button>-->
         </div>
 
 
@@ -37,28 +36,18 @@
 <script>
     export default {
         name: "Currencies",
-        props: ['route_start_parse', 'route_stop_parse', 'cache'],
+        props: ['route_start_parse'],
         data: function () {
             return {
-                groups: (this.cache.groups) ? this.cache.groups : [{name: 'obmenvalut_donetsk'}, {name: 'obmen_valut_donetsk'}, {name: 'donfinance'}, {name: 'donetsk'}],
+                groups: [{name: 'obmenvalut_donetsk'}, {name: 'obmen_valut_donetsk'}, {name: 'donfinance'}],
                 errors: [],
                 parsing_start: false,
-                keywords: (this.cache.keywords) ? this.cache.keywords[0] : 'куплю безнал',
-                days: (this.cache.days) ? this.cache.days : 1,
+                keywords: 'куплю безнал',
+                days: 1,
             };
-        },
-        created: function() {
-            if (this.cache === 'undefined' || this.cache.length === 0) {
-                console.log("нет")
-            } else {
-                console.log("есть");
-            }
-
-            console.log(this.cache);
         },
         methods: {
             start() {
-                console.log(this.cache.groups);
                 axios.post(this.route_start_parse, {
                     'groups': this.groups,
                     'keywords': this.keywords,
@@ -69,12 +58,6 @@
                     this.errors = error.response.data.errors;
                     // console.log(this.errors);
                 });
-            },
-            stop() {
-                axios.post(this.route_stop_parse).then((response) => {
-                    console.log(response.data);
-                });
-
             },
             addGroup: function () {
                 this.groups.push({name: ''});
@@ -96,9 +79,6 @@
         padding-bottom: 50px;
         .alert-block {
             padding: 0.4rem 0.8rem;
-            /*position: absolute;*/
-            /*width: 99%;*/
-            /*top: 57px;*/
             p {
                 margin-bottom: 0;
             }
@@ -122,12 +102,9 @@
         .input-block {
             display: flex;
             flex-wrap: wrap;
-            /*justify-content: center;*/
-            /*flex-direction: column;*/
             button {
                 flex-basis: 10%;
                 flex-grow: 0;
-                /*margin-bottom: 7px;*/
             }
             input[type='text'] {
                 flex-grow: 1;
@@ -157,7 +134,6 @@
     }
 
     .right-block {
-        /*border: 1px solid red;*/
         display: flex;
         align-items: center;
         flex-direction: column;

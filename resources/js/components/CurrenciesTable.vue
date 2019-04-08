@@ -26,7 +26,6 @@
             </tr>
             </tbody>
         </table>
-        <!--<pre>{{ $data }}</pre>-->
     </div>
 
 </template>
@@ -42,6 +41,7 @@
         },
         computed: {
             channel() {
+                this.posts = [];
                 return window.Echo.private('room.' + this.user.id);
             }
         },

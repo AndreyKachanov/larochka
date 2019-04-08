@@ -42,6 +42,9 @@ Route::group(
         Route::resource('messages', 'MessageController')->only(['index']);
         Route::resource('currencies', 'VkParsingPostsController')->only(['index']);
 
+
+        Route::post('parse', 'VkParsingPostsController@parse')->name('parse');
+
         Route::post('start_parse', 'VkParsingPostsController@startParse')->name('start_parse');
         Route::post('stop_parse', 'VkParsingPostsController@stopParse')->name('stop_parse');
     }
