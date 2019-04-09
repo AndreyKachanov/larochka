@@ -22,11 +22,22 @@ class VkParsingPostsController extends Controller
 
     public function index()
     {
+        //$cache =  Cache::get('parsing_vk_groups')[Auth::user()->id] ?? [];
+        //if (!empty($cache)) {
+        //    foreach ($cache['groups'] as $group) {
+        //        $arr[]['name'] = $group['name'];
+        //    }
+        //
+        //    $cache['groups'] = $arr;
+        //}
+
+        //return view('cabinet.currencies.index', compact('cache'));
         return view('cabinet.currencies.parser');
     }
 
     public function parse(ParsingVkPostsRequest $request)
     {
+
         $groupsFromVk = $this->service->getGroups($request->get('groups'));
 
         $this->service->sendDataToPusher(

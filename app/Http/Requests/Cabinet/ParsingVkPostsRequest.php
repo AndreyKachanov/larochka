@@ -60,7 +60,7 @@ class ParsingVkPostsRequest extends FormRequest
             'keywords' => [
                 'required',
                 'string',
-                'min:3',
+                'min:2',
                 'max:300',
                 'regex:/^[a-zA-Zа-яА-ЯёЁ0-9, ]*$/u'
             ],

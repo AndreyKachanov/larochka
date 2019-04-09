@@ -13,8 +13,8 @@
             <div class="card-body">
 
                 <currencies
-                        route_start_parse="{{route('cabinet.parse')}}"
-                        {{--route_stop_parse="{{route('cabinet.stop_parse')}}"--}}
+                        route_start_parse="{{route('cabinet.start_parse')}}"
+                        route_stop_parse="{{route('cabinet.stop_parse')}}"
                         :cache ="{{  json_encode($cache) }}"
                 >
                 </currencies>

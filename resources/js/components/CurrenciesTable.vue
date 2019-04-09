@@ -41,13 +41,12 @@
         },
         computed: {
             channel() {
-                this.posts = [];
                 return window.Echo.private('room.' + this.user.id);
             }
         },
         mounted() {
             this.channel
-                .listen('PrivateTest', (response) => {
+                .listen('SendPostToPusherWithoutQueue', (response) => {
                     this.posts.push(response.post)
                 });
         }

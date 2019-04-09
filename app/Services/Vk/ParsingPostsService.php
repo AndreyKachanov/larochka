@@ -3,6 +3,7 @@
 namespace App\Services\Vk;
 
 use App\Events\PrivateTest;
+use App\Events\SendPostToPusherWithoutQueue;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
@@ -126,7 +127,7 @@ class ParsingPostsService
             });
 
         $dataForPusher->each(function ($item, $key) use ($userId) {
-            broadcast(new PrivateTest($item, $userId));
+            broadcast(new SendPostToPusherWithoutQueue($item, $userId));
         });
     }
 
@@ -189,6 +190,7 @@ class ParsingPostsService
 
     private function getResponseByGuzzleClient(string $request): array
     {
+        usleep(300000);
         try {
             $response = $this->client->get($request)->getBody()->getContents();
             $json = json_decode($response, true);

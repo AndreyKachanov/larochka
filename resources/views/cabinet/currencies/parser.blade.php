@@ -13,7 +13,7 @@
             <div class="card-body">
 
                 <parser
-                        route_start_parse="{{route('cabinet.parse')}}"
+                        route_parse="{{route('cabinet.parse')}}"
                 >
                 </parser>
 
