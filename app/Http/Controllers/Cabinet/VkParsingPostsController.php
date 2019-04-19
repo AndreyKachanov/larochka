@@ -35,13 +35,20 @@ class VkParsingPostsController extends Controller
         return view('cabinet.currencies.parser');
     }
 
+    /**
+     * @param ParsingVkPostsRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function parse(ParsingVkPostsRequest $request)
     {
-
-        $groupsFromVk = $this->service->getGroups($request->get('groups'));
+        $userId = Auth::id();
+        //$groupsFromVk = $this->service->getGroups($request->get('groups'));
+        $groupsFromVk = Cache::get('parsing_vk_groups_live')[$userId];
+        //dd($groupsFromVk);
 
         $this->service->sendDataToPusher(
-            Auth::user()->id,
+            $userId,
             $groupsFromVk,
             $request->get('keywords'),
             $request->get('days')
@@ -57,7 +64,6 @@ class VkParsingPostsController extends Controller
         $days = $request->get('days');
 
         $groupsFromVk = $this->service->getGroups($groupsFromUser);
-
         $userId = Auth::user()->id;
         $this->service->setParsingDataFromUser($userId, $groupsFromVk, $keywords, $days);
 

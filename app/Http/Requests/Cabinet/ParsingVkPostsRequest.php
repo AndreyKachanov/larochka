@@ -4,6 +4,7 @@ namespace App\Http\Requests\Cabinet;
 
 use App\Services\Vk\ParsingPostsService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Cache;
 
 class ParsingVkPostsRequest extends FormRequest
 {
@@ -41,22 +42,11 @@ class ParsingVkPostsRequest extends FormRequest
      */
     public function rules(): array
     {
+        Cache::forget('parsing_vk_groups_live');
+        $countGroups = count($this->request->get('groups'));
+
         return [
             //общий массив
-            'groups'     => 'required|array|min:1',
-            //каждый элемент массива
-            'groups.*.*' => [
-                'required',
-                'string',
-                'distinct',
-                'min:2',
-                'max:100',
-                function ($attribute, $value, $fail) {
-                    if (!$this->service->checkGroup($value)) {
-                        $fail('Vk group ' . $value . ' does not exist.');
-                    }
-                },
-            ],
             'keywords' => [
                 'required',
                 'string',
@@ -67,9 +57,23 @@ class ParsingVkPostsRequest extends FormRequest
             'days' => [
                 'required',
                 'numeric',
-                'min:1',
+                'min:0',
                 'max:1000'
-            ]
+            ],
+            'groups'     => 'required|array|min:1',
+            //каждый элемент массива
+            'groups.*.*' => [
+                'required',
+                'string',
+                'distinct',
+                'min:2',
+                'max:100',
+                function ($attribute, $value, $fail) use ($countGroups) {
+                    if (!$this->service->checkGroup($value, $countGroups)) {
+                        $fail('Vk group ' . $value . ' does not exist.');
+                    }
+                },
+            ],
         ];
     }
 

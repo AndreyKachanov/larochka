@@ -1,6 +1,5 @@
 <template>
     <div class="row groups-block">
-
         <div class="col-sm-4">
 
             <label for="vk_group" class="col-form-label main-label">Vk group name:</label>
@@ -20,23 +19,49 @@
         <div class="col-sm-4">
 
             <label for="keywords" class="col-form-label">Keywords (comma separated):</label>
-            <input :class="[errors.keywords ? 'is-invalid' : '', 'form-control col-8']" type="text" id="keywords" v-model="keywords" name="keywords">
+            <input :class="[errors.keywords ? 'is-invalid' : '', 'form-control col-11']" type="text" id="keywords" v-model="keywords" name="keywords">
             <div v-for="(error) in errors.keywords" class="invalid-feedback">{{ error }}</div>
 
             <label for="days" class="col-form-label days">Count days:</label>
-            <input id="days" v-model="days" type="number" min="1" max="1000" :class="[errors.days ? 'is-invalid' : '', 'form-control col-8']" name="days">
+            <input id="days" v-model="days" type="number" min="0" max="1000" :class="[errors.days ? 'is-invalid' : '', 'form-control col-11']" name="days">
             <div v-for="(error) in errors.days" class="invalid-feedback">{{ error }}</div>
 
 
         </div>
         <div class="col-sm-4 right-block">
             <img class="money-img" src="/assets/images/money-bag.svg" title="">
-            <!--<img class="money-img" src="/assets/images/wallet.svg" title="">-->
             <button @click="start" class="btn btn-danger">Start parse</button>
         </div>
-
-
+        <div class="table-responsive">
+            <table v-if="posts.length" class="table table-striped table-messages">
+                <thead>
+                <tr class="d-flex">
+                    <th class="col-2">Date</th>
+                    <th class="col-3">Author</th>
+                    <th class="col-4">Post</th>
+                    <th class="col-3">Vk group</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(item) in posts" class="d-flex">
+                    <td class="col-2">{{ item.date }}</td>
+                    <td class="col-3">
+                        <a :href="item.user_src" target="_blank" class="user-link">
+                            <img width="30px;" :src="item.photo_50" alt="">&nbsp;&nbsp;{{ item.first_name }}&nbsp;&nbsp;{{ item.last_name }}
+                        </a>
+                    </td>
+                    <td class="col-4">{{ item.text }}</td>
+                    <td class="col-3">
+                        <a :href="item.group_src" target="_blank" class="group-link" :title="item.group_name">
+                            <img width="30px;" :src="item.group_photo_50" alt="">&nbsp;&nbsp;{{ item.group_screen_name }}
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
+
 </template>
 
 <script>
@@ -48,9 +73,10 @@
     // Init plugin
     Vue.use(Loading);
 
+
     export default {
         name: "Currencies",
-        props: ['route_parse'],
+        props: ['route_parse', 'user'],
         data: function () {
             return {
                 groups: [
@@ -62,30 +88,54 @@
                     {name: 'moneydonetsk'},
                     {name: 'obmenvalyut_dpr'},
                     {name: 'donetsk_obmen_valyuta'},
-                    {name: 'kursvalut_donetsk'},
+                    {name: 'kursvalut_donetsk'}
                 ],
                 errors: [],
                 parsing_start: false,
-                keywords: 'куплю безнал',
+                keywords: 'куплю бн, куплю безнал, куплю приват',
                 days: 1,
                 fullPage: false,
+                posts: []
             };
+        },
+        computed: {
+            channel() {
+                return window.Echo.private('room.' + this.user.id);
+            }
+        },
+        mounted() {
+            this.channel
+                .listen('SendPostToPusherWithQueue', (response) => {
+                    this.posts.push(response.post)
+                });
         },
         methods: {
             start() {
+
+                let loader = this.$loading.show({
+                    // Optional parameters
+                    container: this.fullPage ? null : this.$refs.formContainer,
+                    loader: 'bars',
+                    color: '#4db24d',
+                    width: 128,
+                    height: 128,
+                    // backgroundColor: '#ffdede'
+                });
+
                 axios.post(this.route_parse, {
                     'groups': this.groups,
                     'keywords': this.keywords,
                     'days': this.days
                 }).then((response) => {
-                    loader.hide();
+                    setTimeout(() => loader.hide(), 1200);
                     this.errors = [];
                 }).catch(error => {
+                    loader.hide();
                     this.errors = error.response.data.errors;
-                    // console.log(this.errors);
+                }).then(() => {
                 });
 
-                let loader = this.$loading.show();
+
             },
             addGroup: function () {
                 this.groups.push({name: ''});
@@ -94,8 +144,9 @@
                 if (this.groups.length !== 1) {
                     this.groups.splice(index, 1);
                 }
-                // if (index === 0)
-                //     this.addGroup()
+            },
+            removePosts: function (index) {
+                this.posts.splice(index, 1);
             }
         }
     }
@@ -183,6 +234,10 @@
             margin-top: 40px;
             width: 200px;
         }
+    }
+
+    .user-link:hover, .group-link:hover {
+        text-decoration: none;
     }
 
 </style>

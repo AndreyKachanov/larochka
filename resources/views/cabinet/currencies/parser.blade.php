@@ -14,10 +14,11 @@
 
                 <parser
                         route_parse="{{route('cabinet.parse')}}"
+                        :user="{{Auth::user()}}"
                 >
                 </parser>
 
-                <currencies-table :user="{{Auth::user()}}"></currencies-table>
+                {{--<currencies-table :user="{{Auth::user()}}"></currencies-table>--}}
             </div>
         </div>
     </div>

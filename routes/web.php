@@ -2,9 +2,24 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-//Route::get('/test', function () {
-//    \App\Events\PublicChat::dispatch("get my message");
+//Route::get('/test123', function () {
+//    dump(\Illuminate\Support\Carbon::now()->format('d.m.Y H:i:s'));
+//    $client = new GuzzleHttp\Client();
+//    $test = $client->request('GET', 'https://api.vk.com/method/resolveScreenName', [
+//        'delay' => '5000',
+//        'query' => [
+//            'screen_name' => 'obmenvalut_donetsk',
+//            'access_token' => 'aa925c2e8a667e459f75892ba010bfab47c0cb2920e18cbc17491bce4e1b2829f135a86434e77c6f707c8',
+//            'v' => '5.92'
+//        ]
+//    ]);
+//    dump(json_decode($test->getBody()->getContents(), true));
+//    dump(\Illuminate\Support\Carbon::now()->format('d.m.Y H:i:s'));
 //})->name('test');
+//
+Route::get('/test234', function () {
+    dump(\Illuminate\Support\Carbon::now()->subDays(10)->startOfDay());
+})->name('test234');
 
 Route::get('/test', 'TestController@test')->name('test');
 //Route::get('/test3', 'TestController@test3')->name('test3');
