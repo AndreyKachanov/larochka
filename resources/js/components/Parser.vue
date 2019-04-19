@@ -93,7 +93,7 @@
                 errors: [],
                 parsing_start: false,
                 keywords: 'куплю бн, куплю безнал, куплю приват',
-                days: 1,
+                days: 0,
                 fullPage: false,
                 posts: []
             };
