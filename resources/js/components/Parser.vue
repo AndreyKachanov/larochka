@@ -22,7 +22,7 @@
             <input :class="[errors.keywords ? 'is-invalid' : '', 'form-control col-11']" type="text" id="keywords" v-model="keywords" name="keywords">
             <div v-for="(error) in errors.keywords" class="invalid-feedback">{{ error }}</div>
 
-            <label for="days" class="col-form-label days">Count days(0 - current day, 1 - yesterday):</label>
+            <label for="days" class="col-form-label days">Count days(0 - current day, 1 - yesterday, etc):</label>
             <input id="days" v-model="days" type="number" min="0" max="1000" :class="[errors.days ? 'is-invalid' : '', 'form-control col-11']" name="days">
             <div v-for="(error) in errors.days" class="invalid-feedback">{{ error }}</div>
 
