@@ -93,6 +93,7 @@
                 errors: [],
                 parsing_start: false,
                 keywords: 'куплю бн, куплю безнал, куплю приват, куплю гривну, куплю безналичную, куплю грн',
+                // keywords: 'куплю бн',
                 days: 0,
                 fullPage: false,
                 posts: []

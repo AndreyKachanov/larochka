@@ -41,7 +41,7 @@ class ParsingPostsService
             'access_token' => $this->accessToken,
             'v' => '5.92'
         ];
-        $delay = $countGroups > 3 ? '333.3' : '0';
+        $delay = $countGroups > 3 ? 333.3 : 0;
         $response = $this->getResponseByGuzzleClient2($url, $query, $delay);
         if (!empty($response['response'])) {
             if ($response['response']['type'] === 'group') {
@@ -253,9 +253,9 @@ class ParsingPostsService
                         $temp['group_id'] = $item['from_id'] ?? null;
                         $temp['user_src'] = 'https://vk.com/id' . $profile['id'];
                         $temp['date'] = $item['date'] ?? null;
-                        $temp['text'] = (iconv_strlen($item['text']) < 1000
+                        $temp['text'] = (iconv_strlen($item['text']) < 400
                                 ? $item['text']
-                                : 'post > 1000 symbols')
+                                : '*** spam (400+ symbols) ***')
                             ?? null;
                         $temp['photo_50'] = $profile['photo_50'] ?? null;
                         $temp['group_photo_50'] = $responseGroup['photo_50'] ?? null;
@@ -323,11 +323,12 @@ class ParsingPostsService
             if (isset($json['error'])) {
                 $error = $json['error'];
                 $errorMsg = sprintf(
-                    'Response vk has error. Error code - %d, error msg - %s. Class - %s, line - %d',
+                    'Response vk has error. Error code - %d, error msg - %s. Class - %s, line - %d, query - %s',
                     $error['error_code'],
                     $error['error_msg'],
                     __CLASS__,
-                    __LINE__
+                    __LINE__,
+                    $url
                 );
                 dd($errorMsg);
             }
