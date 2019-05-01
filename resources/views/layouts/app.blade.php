@@ -92,7 +92,6 @@
 
     <!-- Scripts -->
     <script  src="{{ mix('js/app.js', (config('app.env') == 'local') ? 'build' : '') }}" defer></script>
-    <script src="https://ze2019.com/ze-widget.js"></script>
     @yield('scripts')
 </body>
 </html>

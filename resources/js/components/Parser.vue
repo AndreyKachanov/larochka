@@ -18,11 +18,21 @@
         </div>
         <div class="col-sm-4">
 
-            <label for="keywords" class="col-form-label">Keywords (comma separated):</label>
-            <input :class="[errors.keywords ? 'is-invalid' : '', 'form-control col-11']" type="text" id="keywords" v-model="keywords" name="keywords">
-            <div v-for="(error) in errors.keywords" class="invalid-feedback">{{ error }}</div>
+            <label for="keywords_buy" class="col-form-label">Keywords (comma separated):</label>
 
-            <label for="days" class="col-form-label days">Count days(0 - current day, 1 - yesterday, etc):</label>
+            <div class="keywords-block">
+                <input type="radio" name="radio_keywords" v-model="radio_keywords" value="buy">
+                <input :class="[errors.keywords_buy ? 'is-invalid' : '', 'form-control col-11']" type="text" id="keywords_buy" v-model="keywords_buy" name="keywords_buy">
+                <div v-for="(error) in errors.keywords_buy" class="invalid-feedback">{{ error }}</div>
+            </div>
+
+            <div class="keywords-block">
+                <input type="radio" name="radio_keywords" v-model="radio_keywords" value="sale">
+                <input :class="[errors.keywords_sale ? 'is-invalid' : '', 'form-control col-11']" type="text" id="keywords_sale" v-model="keywords_sale" name="keywords_sale">
+                <div v-for="(error) in errors.keywords_sale" class="invalid-feedback">{{ error }}</div>
+            </div>
+
+            <label for="days" class="col-form-label days">Count days (0 - current day, 1 - yesterday, etc):</label>
             <input id="days" v-model="days" type="number" min="0" max="1000" :class="[errors.days ? 'is-invalid' : '', 'form-control col-11']" name="days">
             <div v-for="(error) in errors.days" class="invalid-feedback">{{ error }}</div>
 
@@ -92,7 +102,9 @@
                 ],
                 errors: [],
                 parsing_start: false,
-                keywords: 'куплю бн, куплю безнал, куплю приват, куплю гривну, куплю безналичную, куплю грн',
+                keywords_buy: 'куплю бн, куплю безнал, куплю приват, куплю гривну, куплю безналичную, куплю грн',
+                keywords_sale: 'продам бн, продам безнал, продам приват, продам гривну, продам безналичную, продам грн',
+                radio_keywords: 'buy',
                 // keywords: 'куплю бн',
                 days: 0,
                 fullPage: false,
@@ -107,12 +119,12 @@
         mounted() {
             this.channel
                 .listen('SendPostToPusherWithQueue', (response) => {
+                    console.log(1);
                     this.posts.push(response.post)
                 });
         },
         methods: {
             start() {
-
                 let loader = this.$loading.show({
                     // Optional parameters
                     container: this.fullPage ? null : this.$refs.formContainer,
@@ -120,12 +132,14 @@
                     color: '#4db24d',
                     width: 128,
                     height: 128,
-                    // backgroundColor: '#ffdede'
+                    backgroundColor: '#b6b3ff'
                 });
+
+                let keywords = (this.radio_keywords === 'buy') ? this.keywords_buy : this.keywords_sale;
 
                 axios.post(this.route_parse, {
                     'groups': this.groups,
-                    'keywords': this.keywords,
+                    'keywords': keywords,
                     'days': this.days
                 }).then((response) => {
                     setTimeout(() => loader.hide(), 1200);
@@ -156,6 +170,10 @@
 <style lang="scss" scoped>
 
     .groups-block {
+        .table-responsive {
+            margin-top: 25px;
+        }
+        
         padding-bottom: 15px;
         .alert-block {
             padding: 0.4rem 0.8rem;
@@ -174,8 +192,12 @@
         input[type='number'] {
             margin-top: 7px;
         }
-        input[name='keywords'], input[name='days'] {
+        input[name='keywords_buy'], input[name='days'] {
             margin-top: 0;
+        }
+
+        input[name='keywords_sale'] {
+            margin-top: 7px;
         }
 
         button.btn:focus {
@@ -217,6 +239,19 @@
         .form-control {
             background-image: none;
             padding: 0.375rem 0.75rem;
+        }
+
+        .keywords-block {
+            display: flex;
+            align-items: center;
+
+            input[type='radio'] {
+                margin-right: 10px;
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+
         }
     }
 

@@ -181,14 +181,14 @@ class ParsingPostsService
             'days'     => $days
         ];
 
-        $moreThat = Carbon::now()->subDay($days)->startOfDay()->timestamp;
         $posts = $this->getPosts($arr);
         //dd($posts);
 
+        $moreThat = Carbon::now()->subDay($days)->startOfDay()->timestamp;
         $dataForPusher = $posts->where('date', '>=', $moreThat)
             ->sortByDesc('date')
             ->map(function ($item, $key) {
-                $item['date'] = Carbon::createFromTimestamp($item['date'])->addHour()->format('d.m.Y H:i:s');
+                $item['date'] = Carbon::createFromTimestamp($item['date'])->format('d.m.Y H:i:s');
                 return $item;
             });
 
