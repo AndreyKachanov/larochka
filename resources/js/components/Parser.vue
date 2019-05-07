@@ -173,7 +173,7 @@
         .table-responsive {
             margin-top: 25px;
         }
-        
+
         padding-bottom: 15px;
         .alert-block {
             padding: 0.4rem 0.8rem;
