@@ -11,7 +11,6 @@ use jamesiarmes\PhpEws\Enumeration\ContainmentComparisonType;
 use jamesiarmes\PhpEws\Enumeration\ContainmentModeType;
 use jamesiarmes\PhpEws\Enumeration\FolderQueryTraversalType;
 use jamesiarmes\PhpEws\Request\FindFolderType;
-use jamesiarmes\PhpEws\Request\GetFolderType;
 use jamesiarmes\PhpEws\Request\GetItemType;
 use jamesiarmes\PhpEws\Type\ContainsExpressionType;
 use jamesiarmes\PhpEws\Type\FieldOrderType;
@@ -27,17 +26,12 @@ use jamesiarmes\PhpEws\ArrayType\NonEmptyArrayOfBaseFolderIdsType;
 use jamesiarmes\PhpEws\Type\DistinguishedFolderIdType;
 use jamesiarmes\PhpEws\Enumeration\DistinguishedFolderIdNameType;
 use jamesiarmes\PhpEws\Request\FindItemType;
-use jamesiarmes\PhpEws\Type\IsGreaterThanOrEqualToType;
 use jamesiarmes\PhpEws\Type\PathToUnindexedFieldType;
 use jamesiarmes\PhpEws\Enumeration\UnindexedFieldURIType;
-use jamesiarmes\PhpEws\Type\FieldURIOrConstantType;
 use jamesiarmes\PhpEws\Type\ConstantValueType;
-use jamesiarmes\PhpEws\Type\IsLessThanOrEqualToType;
 use jamesiarmes\PhpEws\Type\RestrictionType;
-use jamesiarmes\PhpEws\Type\AndType;
 use jamesiarmes\PhpEws\Enumeration\ItemQueryTraversalType;
 use jamesiarmes\PhpEws\Enumeration\BodyTypeResponseType;
-use DateTime;
 use Exception;
 use GuzzleHttp\Client as GuzzleClient;
 
@@ -54,30 +48,12 @@ class ParseMailBox
 
     public function getMessagesIds(int $offset, int $maxEntriesReturned, array $folder): array
     {
-//        $request_folder_inbox = new GetFolderType();
-//        $request_folder_inbox->FolderShape = new FolderResponseShapeType();
-//        $request_folder_inbox->FolderShape->BaseShape = DefaultShapeNamesType::ALL_PROPERTIES;
-//        $request_folder_inbox->FolderIds = new NonEmptyArrayOfBaseFolderIdsType();
-//        $request_folder_inbox->FolderIds->DistinguishedFolderId = new DistinguishedFolderIdType();
-//        $request_folder_inbox->FolderIds->DistinguishedFolderId->Id = DistinguishedFolderIdNameType::INBOX;
-//        $response_folder_inbox = $this->client->GetFolder($request_folder_inbox);
-
-        // Кол-во писем в INBOX
-        // dump($response_folder_inbox->ResponseMessages->GetFolderResponseMessage[0]->Folders->Folder[0]->TotalCount);
-
         $request = new FindItemType;
         $request->ItemShape = new ItemResponseShapeType;
         $request->ItemShape->BaseShape = DefaultShapeNamesType::ID_ONLY;
         $request->Traversal = ItemQueryTraversalType::SHALLOW;
 
-        // Извлекаем объекты из папки INBOX
-//        $request->ParentFolderIds = new NonEmptyArrayOfBaseFolderIdsType;
-//        $request->ParentFolderIds->DistinguishedFolderId = new DistinguishedFolderIdType;
-//        $request->ParentFolderIds->DistinguishedFolderId->Id = [];
-//        $request->ParentFolderIds->DistinguishedFolderId->Id = DistinguishedFolderIdNameType::INBOX;
-
-
-//        Извлекаем объекты не из папки INBOX (по айдишнику)
+        // Извлекаем объекты не из папки INBOX (по айдишнику)
         $request->ParentFolderIds = new NonEmptyArrayOfBaseFolderIdsType();
         $request->ParentFolderIds->FolderId = new FolderIdType();
         $request->ParentFolderIds->FolderId->Id = $folder['folder_id'];
@@ -115,7 +91,6 @@ class ParseMailBox
         $parts_request->ItemShape->AdditionalProperties = new NonEmptyArrayOfPathsToElementType;
         $parts_request->ItemShape->AdditionalProperties->FieldURI = [$body_property, $body_property2, $body_property3];
 
-
         $parts_request->ItemIds = new NonEmptyArrayOfBaseItemIdsType;
         $parts_request->ItemIds->ItemId = [];
 
@@ -148,7 +123,7 @@ class ParseMailBox
             }
         }
 
-//        dd($ids);
+        // dd($ids);
         return $ids;
     }
 
@@ -183,7 +158,6 @@ class ParseMailBox
 
         $parts_request->ItemIds = new NonEmptyArrayOfBaseItemIdsType;
         $parts_request->ItemIds->ItemId = [];
-
 
         foreach ($messagesIds as $messagesId) {
             $message_item = new ItemIdType;
@@ -225,13 +199,41 @@ class ParseMailBox
                     'sender'        => $sender,
                     'email'         => $email,
                     'ip_address'    => $ipAddressFromMessage ?? null,
-                    'city'          => (isset($dataFromIpApi['city'])) ? (($dataFromIpApi['city'] == "") ? null : $dataFromIpApi['city']) : null,
-                    'country_code'  => (isset($dataFromIpApi['countryCode'])) ? (($dataFromIpApi['countryCode'] == "") ? null : strtolower($dataFromIpApi['countryCode'])) : null,
-                    'country'       => (isset($dataFromIpApi['country'])) ? (($dataFromIpApi['country'] == "") ? null : $dataFromIpApi['country']) : null,
-                    'isp'           => (isset($dataFromIpApi['isp'])) ? (($dataFromIpApi['isp'] == "") ? null : $dataFromIpApi['isp']) : null,
-                    'mobile'        => (isset($dataFromIpApi['mobile'])) ? (($dataFromIpApi['mobile'] == "") ? false : true) : false,
-                    'org'           => (isset($dataFromIpApi['org'])) ? (($dataFromIpApi['org'] == "") ? null : $dataFromIpApi['org']) : null,
-                    'region_name'   => (isset($dataFromIpApi['regionName'])) ? (($dataFromIpApi['regionName'] == "") ? null : $dataFromIpApi['regionName']) : null,
+                    'city'          => (isset($dataFromIpApi['city']))
+                        ? (($dataFromIpApi['city'] == "")
+                            ? null
+                            : $dataFromIpApi['city'])
+                        : null,
+                    'country_code'  => (isset($dataFromIpApi['countryCode']))
+                        ? (($dataFromIpApi['countryCode'] == "")
+                            ? null
+                            : strtolower($dataFromIpApi['countryCode']))
+                        : null,
+                    'country'       => (isset($dataFromIpApi['country']))
+                        ? (($dataFromIpApi['country'] == "")
+                            ? null
+                            : $dataFromIpApi['country'])
+                        : null,
+                    'isp'           => (isset($dataFromIpApi['isp']))
+                        ? (($dataFromIpApi['isp'] == "")
+                            ? null
+                            : $dataFromIpApi['isp'])
+                        : null,
+                    'mobile'        => (isset($dataFromIpApi['mobile']))
+                        ? (($dataFromIpApi['mobile'] == "")
+                            ? false
+                            : true)
+                        : false,
+                    'org'           => (isset($dataFromIpApi['org']))
+                        ? (($dataFromIpApi['org'] == "")
+                            ? null
+                            : $dataFromIpApi['org'])
+                        : null,
+                    'region_name'   => (isset($dataFromIpApi['regionName']))
+                        ? (($dataFromIpApi['regionName'] == "")
+                            ? null
+                            : $dataFromIpApi['regionName'])
+                        : null,
                     'folder_name'   => $folder['name'],
                     'folder_id'     => $folderId,
                 ];

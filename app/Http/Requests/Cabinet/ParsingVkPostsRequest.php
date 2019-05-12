@@ -32,6 +32,7 @@ class ParsingVkPostsRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        //dd($this->request->all());
         return true;
     }
 
@@ -52,7 +53,7 @@ class ParsingVkPostsRequest extends FormRequest
                 'string',
                 'min:2',
                 'max:300',
-                'regex:/^[a-zA-Zа-яА-ЯёЁ0-9, ]*$/u'
+                'regex:/^[\/\a-zA-Zа-яА-ЯёЁ0-9, ]*$/u'
             ],
             'days' => [
                 'required',
