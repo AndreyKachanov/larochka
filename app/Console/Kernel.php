@@ -29,8 +29,8 @@ class Kernel extends ConsoleKernel
         $schedule->command(ParseMailBoxCommand::class)
             ->everyTenMinutes();
 
-        $schedule->command(ParsingPostsCommand::class)
-            ->everyMinute();
+        //$schedule->command(ParsingPostsCommand::class)
+        //    ->everyMinute();
     }
 
     /**

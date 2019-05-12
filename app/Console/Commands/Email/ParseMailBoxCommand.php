@@ -7,7 +7,6 @@ use Illuminate\Console\Command;
 use App\Entity\Email\Message;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Redis;
 
 class ParseMailBoxCommand extends Command
 {
@@ -40,7 +39,6 @@ class ParseMailBoxCommand extends Command
         parent::__construct();
 
         $this->service = $service;
-        $this->foldersFromExchange = $this->service->getFoldersFromExchange(config('mail.ms_exchange_parse_folders'));
     }
 
     /**
@@ -49,7 +47,10 @@ class ParseMailBoxCommand extends Command
     public function handle(): bool
     {
         $maxEntriesReturned = (int)config('mail.ms_exchange_count_parsing');
+        // список папок из конфига
+        $this->foldersFromExchange = $this->service->getFoldersFromExchange(config('mail.ms_exchange_parse_folders'));
 
+        //максимум 150 писем распарсивать за раз
         if ($maxEntriesReturned > 150 || $maxEntriesReturned == 0) {
             $this->error("Value MS_EXCHANGE_COUNT_PARSING must be from 1 to 150");
             return false;
@@ -59,8 +60,6 @@ class ParseMailBoxCommand extends Command
             $this->handleMessages(0, $maxEntriesReturned, $this->foldersFromExchange[0]);
             // иначе подсчитываем сколько в бд хранится по каждой папке записей.
         } else {
-            //$lastFolderId = Message::orderByDesc('id')->first()->folder_id;
-
             // извлекаем сгруппированный массив по папкам с количество в каждой
             $foldersFromDb = Message::all()->groupBy('folder_id')->map(function ($t) {
                 /**@var Collection $t */
@@ -99,7 +98,13 @@ class ParseMailBoxCommand extends Command
         $messagesIds = $this->service->getMessagesIds($offset, $maxEntriesReturned, $folder);
 
         if (empty($messagesIds)) {
-            $this->error('Parsing of folder >> ' . $folder['name'] . ' <<. Missing data. offset ' . $offset . ', max entries ' . $maxEntriesReturned . '.');
+            $errorMsg = sprintf(
+                'Parsing of folder >>%s<<. Missing data, offset %d, max entries %d.',
+                $folder['name'],
+                $offset,
+                $maxEntriesReturned
+            );
+            $this->error($errorMsg);
             return false;
         }
 
@@ -108,7 +113,15 @@ class ParseMailBoxCommand extends Command
         $this->clearCache();
 
         if ($result) {
-            $this->info('Parsing of folder >> ' . $folder['name'] . ' <<. Parsing successfully completed. offset ' . $offset . ', max entries ' . $maxEntriesReturned . ', inserted rows - ' . count($dataFromDB) . '.');
+            $resultMsg = sprintf(
+                'Parsing of folder >>%s<<. Parsing successfully completed. Offset %d, max entries %d, inserted rows - %d',
+                $folder['name'],
+                $offset,
+                $maxEntriesReturned,
+                count($dataFromDB)
+            );
+
+            $this->info($resultMsg);
         }
 
         return true;

@@ -22,14 +22,14 @@
 
             <div class="keywords-block">
                 <input type="radio" name="radio_keywords" v-model="radio_keywords" value="buy">
-                <input :class="[errors.keywords_buy ? 'is-invalid' : '', 'form-control col-11']" type="text" id="keywords_buy" v-model="keywords_buy" name="keywords_buy">
-                <div v-for="(error) in errors.keywords_buy" class="invalid-feedback">{{ error }}</div>
+                <input :class="[error_keywords_buy ? 'is-invalid' : '', 'form-control col-11']" type="text" id="keywords_buy" v-model="keywords_buy" name="keywords_buy">
+                <div v-for="(error) in errors.keywords" class="invalid-keywords invalid-feedback">{{ error }}</div>
             </div>
 
             <div class="keywords-block">
                 <input type="radio" name="radio_keywords" v-model="radio_keywords" value="sale">
-                <input :class="[errors.keywords_sale ? 'is-invalid' : '', 'form-control col-11']" type="text" id="keywords_sale" v-model="keywords_sale" name="keywords_sale">
-                <div v-for="(error) in errors.keywords_sale" class="invalid-feedback">{{ error }}</div>
+                <input :class="[error_keywords_sale ? 'is-invalid' : '', 'form-control col-11']" type="text" id="keywords_sale" v-model="keywords_sale" name="keywords_sale">
+                <div v-for="(error) in errors.keywords" class="invalid-keywords invalid-feedback">{{ error }}</div>
             </div>
 
             <label for="days" class="col-form-label days">Count days (0 - current day, 1 - yesterday, etc):</label>
@@ -94,16 +94,18 @@
                     {name: 'obmen_valut_donetsk'},
                     {name: 'donfinance'},
                     {name: 'donetsk'},
-                    {name: 'club156050748'},
-                    {name: 'moneydonetsk'},
-                    {name: 'obmenvalyut_dpr'},
-                    {name: 'donetsk_obmen_valyuta'},
-                    {name: 'kursvalut_donetsk'}
+                    // {name: 'club156050748'},
+                    // {name: 'moneydonetsk'},
+                    // {name: 'obmenvalyut_dpr'},
+                    // {name: 'donetsk_obmen_valyuta'},
+                    // {name: 'kursvalut_donetsk'}
                 ],
                 errors: [],
+                error_keywords_buy: false,
+                error_keywords_sale: false,
                 parsing_start: false,
-                keywords_buy: 'куплю бн, куплю безнал, куплю приват, куплю гривну, куплю безналичную, куплю грн',
-                keywords_sale: 'продам бн, продам безнал, продам приват, продам гривну, продам безналичную, продам грн',
+                keywords_buy: 'куплю бн, куплю безнал, куплю б/н, куплю б\\н, куплю приват, куплю гривну, куплю безналичную, куплю грн',
+                keywords_sale: 'продам бн, продам безнал, продам б/н, продам б\\н продам приват, продам гривну, продам безналичную, продам грн',
                 radio_keywords: 'buy',
                 // keywords: 'куплю бн',
                 days: 0,
@@ -135,22 +137,28 @@
                     backgroundColor: '#b6b3ff'
                 });
 
-                let keywords = (this.radio_keywords === 'buy') ? this.keywords_buy : this.keywords_sale;
+                let obj = {};
 
-                axios.post(this.route_parse, {
-                    'groups': this.groups,
-                    'keywords': keywords,
-                    'days': this.days
-                }).then((response) => {
+                obj['keywords'] = (this.radio_keywords === 'buy') ? this.keywords_buy : this.keywords_sale;
+                obj['groups'] = this.groups;
+                obj['days'] = this.days;
+
+                axios.post(this.route_parse, obj).then((response) => {
                     setTimeout(() => loader.hide(), 1200);
                     this.errors = [];
                 }).catch(error => {
                     loader.hide();
                     this.errors = error.response.data.errors;
-                }).then(() => {
-                });
-
-
+                    if (typeof this.errors.keywords !== 'undefined') {
+                        if (this.radio_keywords === 'buy')  {
+                            this.error_keywords_buy = true;
+                            this.error_keywords_sale = false;
+                        } else {
+                            this.error_keywords_sale = true;
+                            this.error_keywords_buy = false;
+                        }
+                    }
+                }).then(() => {});
             },
             addGroup: function () {
                 this.groups.push({name: ''});
@@ -243,6 +251,7 @@
 
         .keywords-block {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
 
             input[type='radio'] {
@@ -251,7 +260,9 @@
                     cursor: pointer;
                 }
             }
-
+            .invalid-keywords {
+                margin-left: 23px;
+            }
         }
     }
 
