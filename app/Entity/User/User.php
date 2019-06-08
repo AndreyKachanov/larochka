@@ -51,6 +51,7 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\User\User whereRole($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\User\User whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\User\User whereVerifyToken($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Entity\Chat\Room[] $rooms
  */
 class User extends Authenticatable
 {

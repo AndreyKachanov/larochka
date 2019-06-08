@@ -1,21 +1,102 @@
 <?php
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use JiraRestApi\Project\ProjectService;
+use JiraRestApi\JiraException;
+use JiraRestApi\Issue\IssueService;
 
-//Route::get('/test123', function () {
-//    dump(\Illuminate\Support\Carbon::now()->format('d.m.Y H:i:s'));
-//    $client = new GuzzleHttp\Client();
-//    $test = $client->request('GET', 'https://api.vk.com/method/resolveScreenName', [
-//        'delay' => '5000',
-//        'query' => [
-//            'screen_name' => 'obmenvalut_donetsk',
-//            'access_token' => 'aa925c2e8a667e459f75892ba010bfab47c0cb2920e18cbc17491bce4e1b2829f135a86434e77c6f707c8',
-//            'v' => '5.92'
-//        ]
-//    ]);
-//    dump(json_decode($test->getBody()->getContents(), true));
-//    dump(\Illuminate\Support\Carbon::now()->format('d.m.Y H:i:s'));
-//})->name('test');
+
+Route::get('/test123', function () {
+
+    //$jql = 'created >= 2019-05-25 AND created <= 2019-06-25 AND assignee in (herasymchuk, chumak, sviridov, urvant, rezvanova, rizhuk, kostina, kondratska) AND creator not in (herasymchuk, chumak, sviridov, urvant, rezvanova, rizhuk, kostina, kondratska) ORDER BY created DESC';
+
+    $jql = 'project = HELP order by key asc';
+    //$jql = 'project not in (TEST)  and assignee = currentUser() and status in (Resolved, closed)';
+
+    try {
+        $issueService = new IssueService();
+
+        $pagination = -1;
+
+        $startAt = 0;	//the index of the first issue to return (0-based)
+        $maxResult = 1;	// the maximum number of issues to return (defaults to 50).
+        $totalCount = -1;	// the number of issues to return
+        // first fetch
+        $ret = $issueService->search(
+            $jql,
+            $startAt,
+            $maxResult,
+            $fields = [
+                //'*all',
+                'summary',
+                'issuetype',
+                'creator',
+                'assignee',
+                'status',
+                'components',
+                'created'
+            ],
+            $expand = [
+                'changelog'
+            ]
+        );
+        dd($ret);
+        $totalCount = $ret->total;
+    } catch (JiraException $e) {
+        $this->assertTrue(false, 'testSearch Failed : '.$e->getMessage());
+    }
+
+})->name('test');
+
+Route::get('/test111', function () {
+    $username = config('jira.user');
+    $password = config('jira.password');
+
+    //$url = 'https://xxx.atlassian.net/rest/api/2/Issue/Bug-5555';
+    $url = 'https://sd.court.gov.ua/rest/api/2/issue/HELP-9903?expand=changelog';
+
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_USERPWD, "$username:$password");
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+
+    $issue_list = (curl_exec($curl));
+    dd(json_decode($issue_list));
+
+})->name('test111');
+
+Route::get('/test222', function () {
+    try {
+        $issueService = new IssueService();
+
+        $queryParam = [
+            'fields' => [  // default: '*all'
+                           'summary',
+                           'comment',
+                           //'changelog'
+            ],
+            'expand' => [
+                //'renderedFields',
+                //'names',
+                //'schema',
+                //'transitions',
+                //'operations',
+                //'editmeta',
+                'changelog',
+            ]
+        ];
+
+        $issue = $issueService->get('HELP-9903', $queryParam);
+
+        dd($issue->fields);
+    } catch (JiraException $e) {
+        print("Error Occured! " . $e->getMessage());
+    }
+
+})->name('test111');
 //
 Route::get('/test234', function () {
     dump(\Illuminate\Support\Carbon::now()->subDays(10)->startOfDay());
