@@ -10,7 +10,7 @@ Route::get('/test123', function () {
 
     //$jql = 'created >= 2019-05-25 AND created <= 2019-06-25 AND assignee in (herasymchuk, chumak, sviridov, urvant, rezvanova, rizhuk, kostina, kondratska) AND creator not in (herasymchuk, chumak, sviridov, urvant, rezvanova, rizhuk, kostina, kondratska) ORDER BY created DESC';
 
-    $jql = 'project = HELP order by key asc';
+    $jql = 'key = HELP-10211';
     //$jql = 'project not in (TEST)  and assignee = currentUser() and status in (Resolved, closed)';
 
     try {
@@ -19,7 +19,7 @@ Route::get('/test123', function () {
         $pagination = -1;
 
         $startAt = 0;	//the index of the first issue to return (0-based)
-        $maxResult = 1;	// the maximum number of issues to return (defaults to 50).
+        $maxResult = 5;	// the maximum number of issues to return (defaults to 50).
         $totalCount = -1;	// the number of issues to return
         // first fetch
         $ret = $issueService->search(
@@ -70,28 +70,11 @@ Route::get('/test111', function () {
 
 Route::get('/test222', function () {
     try {
-        $issueService = new IssueService();
+        $us = new \JiraRestApi\User\UserService();
 
-        $queryParam = [
-            'fields' => [  // default: '*all'
-                           'summary',
-                           'comment',
-                           //'changelog'
-            ],
-            'expand' => [
-                //'renderedFields',
-                //'names',
-                //'schema',
-                //'transitions',
-                //'operations',
-                //'editmeta',
-                'changelog',
-            ]
-        ];
+        $user = $us->get(['username' => 'sviridov']);
 
-        $issue = $issueService->get('HELP-9903', $queryParam);
-
-        dd($issue->fields);
+        dd($user);
     } catch (JiraException $e) {
         print("Error Occured! " . $e->getMessage());
     }

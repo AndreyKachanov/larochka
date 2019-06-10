@@ -9,11 +9,14 @@
 namespace App\Services\Jira;
 
 use App\Entity\Jira\Issue;
+use App\Entity\Jira\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use JiraRestApi\Issue\IssueSearchResult;
 use JiraRestApi\Issue\IssueService;
 use JiraRestApi\Issue\Issue as JiraIssue;
 use Exception;
+use JiraRestApi\Issue\Reporter;
 
 class ParsingIssuesService
 {
@@ -53,39 +56,44 @@ class ParsingIssuesService
 
     /**
      * @param array $issues
-     * @return array
+     * @return bool
+     * @throws \Throwable
      */
-    public function dataForDb(array $issues): array
+    public function insertToDatabase(array $issues): bool
     {
-        $dataForDb = [];
+        $users = $this->convertUsers($issues);
+
         /** @var JiraIssue $issue */
         foreach ($issues as $issue) {
-            $dataForDb[] = [
+            $issuesForDb[] = [
                 'jira_id'    => $issue->id,
                 'key'        => $issue->key,
                 'summary'    => $issue->fields->summary,
                 'issue_type' => $issue->fields->issuetype->name,
                 'status'     => $issue->fields->status->name,
-                'creator'    => $issue->fields->creator->displayName,
-                'assignee'   => $issue->fields->assignee->displayName,
+                'creator'    => $issue->fields->creator->name,
+                'assignee'   => $issue->fields->assignee->name ?? null,
                 'created_at' => Carbon::instance($issue->fields->created)->addHours(2),
             ];
         }
-        return $dataForDb;
-    }
 
-    /**
-     * @param array $dataFromDB
-     * @return bool
-     */
-    public function insertToDatabase(array $dataFromDB): bool
-    {
-        if (isset($dataFromDB)) {
-            if (count($dataFromDB) > 0) {
+        if (isset($issuesForDb)) {
+            if (count($issuesForDb) > 0) {
                 try {
-                    Issue::insert($dataFromDB);
+                    DB::transaction(function () use ($users, $issuesForDb) {
+                        if (count($users) > 0) {
+                            User::insert($users);
+                        }
+                        Issue::insert($issuesForDb);
+                    }, 5);
                 } catch (Exception $e) {
-                    dd($e->getMessage());
+                    $errorMsg = sprintf(
+                        'Error insert to database issues or users. %s.  Class - %s, line - %d',
+                        $e->getMessage(),
+                        __CLASS__,
+                        __LINE__
+                    );
+                    dd($errorMsg);
                 }
             }
         }
@@ -137,5 +145,89 @@ class ParsingIssuesService
             dd($errorMsg);
         }
         return $result;
+    }
+
+    /**
+     * @param array $issues
+     * @return array
+     */
+    private function convertUsers(array $issues): array
+    {
+        $users = [];
+        $allUsers = [];
+
+        foreach ($issues as $issue) {
+            if ($issue->fields->creator != null) {
+                $allUsers[] = $issue->fields->creator;
+            }
+
+            if ($issue->fields->assignee != null) {
+                $allUsers[] = $issue->fields->assignee;
+            }
+        }
+        //удаляем дубликаты из массива объектов
+        $withoutDuplicates = $this->removeDuplicateValues($allUsers);
+
+        //перебор массива объектов - если в бд уже есть пользователя, исключаем его из массива
+        $checkInDb = array_filter($withoutDuplicates, function (Reporter $obj) {
+            return !$this->checkUserFromDb($obj->name);
+        });
+
+        //формируем массив пользователей
+        /** @var Reporter $user */
+        foreach ($checkInDb as $user) {
+            $users[] = [
+                'user_key'     => $user->name,
+                'display_name' => $user->displayName,
+                'email'        => $user->emailAddress,
+                'avatar'       => $user->avatarUrls['48x48']
+            ];
+        }
+
+        return $users;
+    }
+
+    /**
+     * Checks the existence of a user in the database.
+     * True - exists, false - not exists.
+     *
+     * @param string $userKey
+     * @return bool
+     */
+    private function checkUserFromDb(string $userKey): bool
+    {
+        return User::whereUserKey($userKey)->count();
+    }
+
+    /**
+     * Remove duplicate values in array of objects
+     *
+     * @param $array
+     * @param bool $keepKeyAssoc
+     * @return array
+     */
+    private function removeDuplicateValues($array, $keepKeyAssoc = false): array
+    {
+        $duplicateKey = [];
+        $tmp = [];
+
+        foreach ($array as $key => $val) {
+            // convert objects to arrays, in_array() does not support objects
+            if (is_object($val)) {
+                $val = (array)$val;
+            }
+
+            if (!in_array($val, $tmp)) {
+                $tmp[] = $val;
+            } else {
+                $duplicateKey[] = $key;
+            }
+        }
+
+        foreach ($duplicateKey as $key) {
+            unset($array[$key]);
+        }
+
+        return $keepKeyAssoc ? $array : array_values($array);
     }
 }

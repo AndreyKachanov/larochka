@@ -39,13 +39,14 @@ class ParseIssuesCommand extends Command
 
     /**
      * @return bool
+     * @throws \Throwable
      */
     public function handle(): bool
     {
         $fetchedCount = (int)config('jira.fetched_count');
         $projectName = config('jira.project_name');
 
-        if ($fetchedCount <= 0 || $fetchedCount >= 3000) {
+        if ($fetchedCount <= 0 || $fetchedCount > 3000) {
             $this->error("Value fetchedCount not must be <= 0 || >= 3000");
             return false;
         }
@@ -84,26 +85,25 @@ class ParseIssuesCommand extends Command
      * @param string $jql
      * @param int $fetchedCount
      * @return bool
+     * @throws \Throwable
      */
     private function handleIssues(string $jql, int $fetchedCount): bool
     {
+        $resultMsg = 'No new issues.';
+        //извлекаем из джиры задачи
         $issues = $this->service->fetchDataFromJira($jql, $fetchedCount)->issues;
-        //формируем общий массив
-        $dataForDB = $this->service->dataForDb($issues);
-        //записываем в бд
-        $result = $this->service->insertToDatabase($dataForDB);
 
-        //выводим результат в консоль
-        if ($result) {
-            $resultMsg = sprintf(
-                '%d issues are inserted into the database. Total count in database - %d.',
-                $fetchedCount,
-                $this->service->getTotalIssuesInDb()
-            );
-            $this->info($resultMsg);
-            return true;
+        if (count($issues) > 0) {
+            $result = $this->service->insertToDatabase($issues);
+            if ($result) {
+                $resultMsg = sprintf(
+                    '%d issues are inserted into the database. Total count in database - %d.',
+                    $fetchedCount,
+                    $this->service->getTotalIssuesInDb()
+                );
+            }
         }
-
-        return false;
+        $this->info($resultMsg);
+        return true;
     }
 }

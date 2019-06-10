@@ -36,8 +36,6 @@ class CreateJiraIssuesTable extends Migration
      */
     public function down()
     {
-        if (Schema::hasTable('jira_issues')) {
-            Schema::dropIfExists('jira_issues');
-        }
+        Schema::dropIfExists('jira_issues');
     }
 }
