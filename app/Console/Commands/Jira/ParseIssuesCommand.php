@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands\Jira;
 
+use App\Entity\Jira\Component;
 use App\Entity\Jira\Issue;
 use App\Services\Jira\ParsingIssuesService;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class ParseIssuesCommand extends Command
@@ -43,6 +45,8 @@ class ParseIssuesCommand extends Command
      */
     public function handle(): bool
     {
+        //dd(Issue::find(102)->components()->attach(2));
+
         $fetchedCount = (int)config('jira.fetched_count');
         $projectName = config('jira.project_name');
 
@@ -92,7 +96,7 @@ class ParseIssuesCommand extends Command
         $resultMsg = 'No new issues.';
         //извлекаем из джиры задачи
         $issues = $this->service->fetchDataFromJira($jql, $fetchedCount)->issues;
-
+        //dd($issues);
         if (count($issues) > 0) {
             $result = $this->service->insertToDatabase($issues);
             if ($result) {

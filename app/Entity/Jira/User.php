@@ -21,11 +21,13 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\User whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\User whereUserKey($value)
  * @mixin \Eloquent
+ * @property string|null $created_at
+ * @property string|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\User whereUpdatedAt($value)
  */
 class User extends Model
 {
-    public $timestamps = false;
-
     protected $table = 'jira_users';
 
     protected $guarded = ['id'];

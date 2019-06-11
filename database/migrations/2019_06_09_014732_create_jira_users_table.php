@@ -19,8 +19,9 @@ class CreateJiraUsersTable extends Migration
                 $table->bigIncrements('id');
                 $table->string('user_key', 255)->unique()->nullable();
                 $table->string('display_name', 255)->nullable();
-                $table->string('email', 255)->unique()->nullable();
+                $table->string('email', 255)->nullable();
                 $table->string('avatar', 255)->nullable();
+                $table->timestamps();
             });
         }
     }

@@ -39,16 +39,23 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereCreator($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereIssueType($value)
+ * @property string|null $created_in_jira
+ * @property string|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereCreatedInJira($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereUpdatedAt($value)
  */
 class Issue extends Model
 {
-    public $timestamps = false;
-
     protected $table = 'jira_issues';
 
     protected $guarded = ['id'];
 
     protected $casts = [
-        'date_created' => 'datetime'
+        'created_in_jira' => 'datetime'
     ];
+
+    public function components()
+    {
+        return $this->belongsToMany(Component::class, 'component_issue');
+    }
 }

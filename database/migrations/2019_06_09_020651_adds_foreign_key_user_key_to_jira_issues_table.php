@@ -17,21 +17,21 @@ class AddsForeignKeyUserKeyToJiraIssuesTable extends Migration
         Schema::table('jira_issues', function (Blueprint $table) {
 
             //создаем 2 индекса
-            $table->index(["creator"], 'fk_creator_idx');
-            $table->index(["assignee"], 'fk_assignee_idx');
+            $table->index(['creator'], 'fk_creator_idx');
+            $table->index(['assignee'], 'fk_assignee_idx');
 
             //создаем 2 внешних ключа
             $table->foreign('creator', 'fk_jira_issues_creator')
                 ->references('user_key')
                 ->on('jira_users')
-                ->onDelete('restrict')
-                ->onUpdate('restrict');
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             $table->foreign('assignee', 'fk_jira_issues_assignee')
                 ->references('user_key')
                 ->on('jira_users')
-                ->onDelete('restrict')
-                ->onUpdate('restrict');
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
         });
     }
 

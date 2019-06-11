@@ -10,7 +10,7 @@ Route::get('/test123', function () {
 
     //$jql = 'created >= 2019-05-25 AND created <= 2019-06-25 AND assignee in (herasymchuk, chumak, sviridov, urvant, rezvanova, rizhuk, kostina, kondratska) AND creator not in (herasymchuk, chumak, sviridov, urvant, rezvanova, rizhuk, kostina, kondratska) ORDER BY created DESC';
 
-    $jql = 'key = HELP-10211';
+    $jql = 'key = HELP-10376';
     //$jql = 'project not in (TEST)  and assignee = currentUser() and status in (Resolved, closed)';
 
     try {
@@ -70,11 +70,11 @@ Route::get('/test111', function () {
 
 Route::get('/test222', function () {
     try {
-        $us = new \JiraRestApi\User\UserService();
+        $proj = new ProjectService();
 
-        $user = $us->get(['username' => 'sviridov']);
+        $p = $proj->get('HELP');
 
-        dd($user);
+        dd($p);
     } catch (JiraException $e) {
         print("Error Occured! " . $e->getMessage());
     }

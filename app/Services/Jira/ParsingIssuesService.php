@@ -8,6 +8,7 @@
 
 namespace App\Services\Jira;
 
+use App\Entity\Jira\Component;
 use App\Entity\Jira\Issue;
 use App\Entity\Jira\User;
 use Illuminate\Support\Carbon;
@@ -17,6 +18,8 @@ use JiraRestApi\Issue\IssueService;
 use JiraRestApi\Issue\Issue as JiraIssue;
 use Exception;
 use JiraRestApi\Issue\Reporter;
+use JiraRestApi\Project\ProjectService;
+use JiraRestApi\Project\Component as JiraProjectComponent;
 
 class ParsingIssuesService
 {
@@ -61,41 +64,48 @@ class ParsingIssuesService
      */
     public function insertToDatabase(array $issues): bool
     {
+        //получаем компоненты с джиры
+        $componentsJiraObj = $this->getComponentsFromJira();
+
+        //подготовленный массив отсутствующих в бд пользователей
         $users = $this->convertUsers($issues);
 
-        /** @var JiraIssue $issue */
-        foreach ($issues as $issue) {
-            $issuesForDb[] = [
-                'jira_id'    => $issue->id,
-                'key'        => $issue->key,
-                'summary'    => $issue->fields->summary,
-                'issue_type' => $issue->fields->issuetype->name,
-                'status'     => $issue->fields->status->name,
-                'creator'    => $issue->fields->creator->name,
-                'assignee'   => $issue->fields->assignee->name ?? null,
-                'created_at' => Carbon::instance($issue->fields->created)->addHours(2),
-            ];
-        }
+        //подготовленный массив отсутствующих в бд компонентов
+        $components = $this->convertComponents($componentsJiraObj);
 
-        if (isset($issuesForDb)) {
-            if (count($issuesForDb) > 0) {
-                try {
-                    DB::transaction(function () use ($users, $issuesForDb) {
-                        if (count($users) > 0) {
-                            User::insert($users);
-                        }
-                        Issue::insert($issuesForDb);
-                    }, 5);
-                } catch (Exception $e) {
-                    $errorMsg = sprintf(
-                        'Error insert to database issues or users. %s.  Class - %s, line - %d',
-                        $e->getMessage(),
-                        __CLASS__,
-                        __LINE__
-                    );
-                    dd($errorMsg);
+        try {
+            DB::transaction(function () use ($users, $components, $issues) {
+                if (count($users) > 0) {
+                    User::insert($users);
                 }
-            }
+                if (count($components) > 0) {
+                    Component::insert($components);
+                }
+                /** @var JiraIssue $item */
+                foreach ($issues as $item) {
+                    //создаем сущность Issue и записываем в бд
+                    $issue = new Issue();
+                    $issue->jira_id = (int)$item->id;
+                    $issue->key = $item->key;
+                    $issue->summary = $item->fields->summary;
+                    $issue->issue_type = $item->fields->issuetype->name;
+                    $issue->creator = $item->fields->creator->name;
+                    $issue->assignee = $item->fields->assignee->name ?? null;
+                    $issue->status = $item->fields->status->name;
+                    $issue->created_in_jira = Carbon::instance($item->fields->created)->addHours(3);
+                    $issue->save();
+
+                    //$issue->components()->sync();
+                }
+            }, 5);
+        } catch (Exception $e) {
+            $errorMsg = sprintf(
+                'Error insert to database issues or users. %s.  Class - %s, line - %d',
+                $e->getMessage(),
+                __CLASS__,
+                __LINE__
+            );
+            dd($errorMsg);
         }
 
         return true;
@@ -137,7 +147,7 @@ class ParsingIssuesService
             $result = $issueService->search($jql, $startAt, $maxResult, $fields, $expand);
         } catch (Exception $e) {
             $errorMsg = sprintf(
-                'Error while getting the day started. %s.  Class - %s, line - %d',
+                'Error fetch issues from jira. %s.  Class - %s, line - %d',
                 $e->getMessage(),
                 __CLASS__,
                 __LINE__
@@ -180,7 +190,9 @@ class ParsingIssuesService
                 'user_key'     => $user->name,
                 'display_name' => $user->displayName,
                 'email'        => $user->emailAddress,
-                'avatar'       => $user->avatarUrls['48x48']
+                'avatar'       => $user->avatarUrls['48x48'],
+                'created_at'   => Carbon::now(),
+                'updated_at'   => Carbon::now()
             ];
         }
 
@@ -229,5 +241,51 @@ class ParsingIssuesService
         }
 
         return $keepKeyAssoc ? $array : array_values($array);
+    }
+
+    /**
+     * @return array
+     */
+    private function getComponentsFromJira(): array
+    {
+        $projectName = config('jira.project_name');
+        try {
+            $projectInfoObject = new ProjectService();
+            $project = $projectInfoObject->get($projectName);
+        } catch (Exception $e) {
+            $errorMsg = sprintf(
+                'Error fetch project info from jira. %s.  Class - %s, line - %d',
+                $e->getMessage(),
+                __CLASS__,
+                __LINE__
+            );
+            dd($errorMsg);
+        }
+
+        return $project->components;
+    }
+
+    /**
+     * @param array $componentsJiraObj
+     * @return array
+     */
+    private function convertComponents(array $componentsJiraObj): array
+    {
+        $components = [];
+        $componentsFromDb = Component::pluck('jira_id')->toArray();
+
+        /** @var JiraProjectComponent $compJr */
+        foreach ($componentsJiraObj as $compJr) {
+            if (in_array((int)$compJr->id, $componentsFromDb) === false) {
+                $arr = [
+                    'name'       => $compJr->name,
+                    'jira_id'    => (int)$compJr->id,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ];
+                $components[] = $arr;
+            }
+        }
+        return $components;
     }
 }

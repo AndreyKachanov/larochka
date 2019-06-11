@@ -24,7 +24,8 @@ class CreateJiraIssuesTable extends Migration
                 $table->string('creator')->nullable();
                 $table->string('assignee')->nullable();
                 $table->string('status')->nullable();
-                $table->timestamp('created_at')->nullable();
+                $table->timestamp('created_in_jira')->nullable();
+                $table->timestamps();
             });
         }
     }
