@@ -56,6 +56,6 @@ class Issue extends Model
 
     public function components()
     {
-        return $this->belongsToMany(Component::class, 'component_issue');
+        return $this->belongsToMany(Component::class, 'jira_component_issue');
     }
 }

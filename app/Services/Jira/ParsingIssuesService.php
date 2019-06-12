@@ -83,6 +83,7 @@ class ParsingIssuesService
                 }
                 /** @var JiraIssue $item */
                 foreach ($issues as $item) {
+                    //dd($item->fields->components);
                     //создаем сущность Issue и записываем в бд
                     $issue = new Issue();
                     $issue->jira_id = (int)$item->id;
@@ -95,7 +96,16 @@ class ParsingIssuesService
                     $issue->created_in_jira = Carbon::instance($item->fields->created)->addHours(3);
                     $issue->save();
 
-                    //$issue->components()->sync();
+                    $componentsFromJira = $item->fields->components;
+                    if (count($componentsFromJira) > 0) {
+                        $arrToSync = [];
+                        /** @var JiraProjectComponent $comp */
+                        foreach ($componentsFromJira as $comp) {
+                            $arrToSync[] = $comp->id;
+                        }
+
+                        $issue->components()->sync($arrToSync);
+                    }
                 }
             }, 5);
         } catch (Exception $e) {

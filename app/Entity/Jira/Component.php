@@ -26,11 +26,12 @@ use Illuminate\Database\Eloquent\Model;
 class Component extends Model
 {
     protected $table = 'jira_components';
+    protected $primaryKey = 'jira_id';
 
-    protected $guarded = ['id'];
+    protected $fillable = ['*'];
 
     public function issues()
     {
-        return $this->belongsToMany(Issue::class, 'component_issue');
+        return $this->belongsToMany(Issue::class, 'jira_component_issue', 'jira_id', 'id');
     }
 }

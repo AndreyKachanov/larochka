@@ -15,7 +15,7 @@ class JiraIssueTableSeeder extends Seeder
     {
         if (App::environment('local')) {
             if (Issue::count() == 0) {
-                Issue::create([
+                $issue = Issue::create([
                     'jira_id'         => 11111,
                     'key'             => 'HELP-9999',
                     'summary'         => 'Налаштування параметров авторозподилу',

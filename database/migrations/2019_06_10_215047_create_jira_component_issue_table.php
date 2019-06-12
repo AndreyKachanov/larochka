@@ -26,7 +26,7 @@ class CreateJiraComponentIssueTable extends Migration
             $table->index(['issue_id'], 'fk_component_issue_jira_issues_id_idx');
             $table->index(['component_jira_id'], 'fk_component_issue_jira_components_jira_id_idx');
 
-            $table->foreign('component_jira_id', 'fk_component_issue_jira_components_jira_id')
+            $table->foreign('component_jira_id', 'fk_component_issue_jira_components_id')
                 ->references('jira_id')
                 ->on('jira_components')
                 ->onDelete('cascade')
