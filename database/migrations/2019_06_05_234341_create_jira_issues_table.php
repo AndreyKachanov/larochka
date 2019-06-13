@@ -16,14 +16,17 @@ class CreateJiraIssuesTable extends Migration
     {
         if (!Schema::hasTable('jira_issues')) {
             Schema::create('jira_issues', function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->unsignedBigInteger('jira_id');
-                $table->string('key')->nullable();
+
+                $table->primary('issue_id');
+
+                $table->unsignedBigInteger('issue_id');
+                $table->unsignedInteger('key')->nullable();
                 $table->string('summary')->nullable();
                 $table->string('issue_type')->nullable();
-                $table->string('creator')->nullable();
+                $table->string('creator');
                 $table->string('assignee')->nullable();
                 $table->string('status')->nullable();
+                $table->string('resolution')->nullable();
                 $table->timestamp('created_in_jira')->nullable();
                 $table->timestamps();
             });

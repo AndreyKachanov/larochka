@@ -10,7 +10,7 @@ Route::get('/test123', function () {
 
     //$jql = 'created >= 2019-05-25 AND created <= 2019-06-25 AND assignee in (herasymchuk, chumak, sviridov, urvant, rezvanova, rizhuk, kostina, kondratska) AND creator not in (herasymchuk, chumak, sviridov, urvant, rezvanova, rizhuk, kostina, kondratska) ORDER BY created DESC';
 
-    $jql = 'key = HELP-10376';
+    $jql = 'key = HELP-10389';
     //$jql = 'project not in (TEST)  and assignee = currentUser() and status in (Resolved, closed)';
 
     try {
@@ -27,17 +27,17 @@ Route::get('/test123', function () {
             $startAt,
             $maxResult,
             $fields = [
-                //'*all',
-                'summary',
-                'issuetype',
-                'creator',
-                'assignee',
-                'status',
-                'components',
-                'created'
+                '*all',
+                //'summary',
+                //'issuetype',
+                //'creator',
+                //'assignee',
+                //'status',
+                //'components',
+                //'created'
             ],
             $expand = [
-                'changelog'
+                'changelog',
             ]
         );
         dd($ret);

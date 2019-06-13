@@ -7,31 +7,32 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * App\Entity\Jira\Component
  *
+ * @property int $component_id
+ * @property string $name
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Entity\Jira\Issue[] $issues
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component query()
- * @mixin \Eloquent
- * @property int $id
- * @property string $name
- * @property int $jira_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component whereComponentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component whereJiraId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 class Component extends Model
 {
-    protected $table = 'jira_components';
-    protected $primaryKey = 'jira_id';
+    public $incrementing = false;
 
-    protected $fillable = ['*'];
+    protected $table = 'jira_components';
+
+    protected $primaryKey = 'component_id';
+
+    protected $guarded = ['component_id'];
 
     public function issues()
     {
-        return $this->belongsToMany(Issue::class, 'jira_component_issue', 'jira_id', 'id');
+        return $this->belongsToMany(Issue::class, 'jira_component_issue', 'component_id', 'issue_id');
     }
 }

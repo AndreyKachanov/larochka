@@ -73,26 +73,29 @@ class ParsingIssuesService
         //подготовленный массив отсутствующих в бд компонентов
         $components = $this->convertComponents($componentsJiraObj);
 
+
         try {
             DB::transaction(function () use ($users, $components, $issues) {
                 if (count($users) > 0) {
+                    //dump($users);
                     User::insert($users);
                 }
                 if (count($components) > 0) {
+                    //dump($components);
                     Component::insert($components);
                 }
                 /** @var JiraIssue $item */
                 foreach ($issues as $item) {
-                    //dd($item->fields->components);
                     //создаем сущность Issue и записываем в бд
                     $issue = new Issue();
-                    $issue->jira_id = (int)$item->id;
-                    $issue->key = $item->key;
+                    $issue->issue_id = (int)$item->id;
+                    $issue->key = ($item->key === null) ? null : $this->getCutKey($item->key);
                     $issue->summary = $item->fields->summary;
                     $issue->issue_type = $item->fields->issuetype->name;
                     $issue->creator = $item->fields->creator->name;
                     $issue->assignee = $item->fields->assignee->name ?? null;
                     $issue->status = $item->fields->status->name;
+                    $issue->resolution = $item->fields->resolution->name ?? null;
                     $issue->created_in_jira = Carbon::instance($item->fields->created)->addHours(3);
                     $issue->save();
 
@@ -101,9 +104,9 @@ class ParsingIssuesService
                         $arrToSync = [];
                         /** @var JiraProjectComponent $comp */
                         foreach ($componentsFromJira as $comp) {
-                            $arrToSync[] = $comp->id;
+                            $arrToSync[] = (int)$comp->id;
                         }
-
+                        //dd($arrToSync);
                         $issue->components()->sync($arrToSync);
                     }
                 }
@@ -144,12 +147,13 @@ class ParsingIssuesService
             'creator',
             'assignee',
             'status',
+            'resolution',
             'components',
             'created'
         ];
 
         $expand = [
-            'changelog'
+            //'changelog'
         ];
 
         try {
@@ -282,20 +286,29 @@ class ParsingIssuesService
     private function convertComponents(array $componentsJiraObj): array
     {
         $components = [];
-        $componentsFromDb = Component::pluck('jira_id')->toArray();
+        $componentsFromDb = Component::pluck('component_id')->toArray();
 
         /** @var JiraProjectComponent $compJr */
         foreach ($componentsJiraObj as $compJr) {
             if (in_array((int)$compJr->id, $componentsFromDb) === false) {
                 $arr = [
-                    'name'       => $compJr->name,
-                    'jira_id'    => (int)$compJr->id,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
+                    'name'         => $compJr->name,
+                    'component_id' => (int)$compJr->id,
+                    'created_at'   => Carbon::now(),
+                    'updated_at'   => Carbon::now()
                 ];
                 $components[] = $arr;
             }
         }
         return $components;
+    }
+
+    /**
+     * @param string $item
+     * @return int
+     */
+    private function getCutKey(string $item): int
+    {
+        return (int)explode('HELP-', $item)[1];
     }
 }

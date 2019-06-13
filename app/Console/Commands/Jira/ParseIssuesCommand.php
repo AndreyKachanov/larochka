@@ -7,6 +7,7 @@ use App\Entity\Jira\Issue;
 use App\Services\Jira\ParsingIssuesService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class ParseIssuesCommand extends Command
 {
@@ -50,10 +51,10 @@ class ParseIssuesCommand extends Command
         $fetchedCount = (int)config('jira.fetched_count');
         $projectName = config('jira.project_name');
 
-        if ($fetchedCount <= 0 || $fetchedCount > 3000) {
-            $this->error("Value fetchedCount not must be <= 0 || >= 3000");
-            return false;
-        }
+        //if ($fetchedCount <= 0 || $fetchedCount > 3000) {
+        //    $this->error("Value fetchedCount not must be <= 0 || >= 3000");
+        //    return false;
+        //}
 
         if ($projectName == "") {
             $this->error("Value in .env JIRA_PROJECT_NAME must be contain characters");
@@ -73,13 +74,13 @@ class ParseIssuesCommand extends Command
             }
         //если в бд есть записи - дополняем новыми задачами из джиры
         } else {
-            $lastIssueKey = Issue::orderByDesc('id')->first()->key;
-
+            $lastIssueKey = Issue::orderByDesc('key')->first()->key;
             $jql = sprintf(
-                'project = %s AND key > %s ORDER BY key ASC',
+                'project = %s AND key > HELP-%s ORDER BY key ASC',
                 $projectName,
                 $lastIssueKey
             );
+
             return $this->handleIssues($jql, $fetchedCount);
         }
         return false;
@@ -96,6 +97,7 @@ class ParseIssuesCommand extends Command
         $resultMsg = 'No new issues.';
         //извлекаем из джиры задачи
         $issues = $this->service->fetchDataFromJira($jql, $fetchedCount)->issues;
+        //dd($issues);
         //dd($issues);
         if (count($issues) > 0) {
             $result = $this->service->insertToDatabase($issues);

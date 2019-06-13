@@ -14,26 +14,27 @@ class CreateJiraComponentIssueTable extends Migration
      */
     public function up()
     {
-        Schema::create('jira_component_issue', function (Blueprint $table) {
+        $tableName = 'jira_component_issue';
+        Schema::create($tableName, function (Blueprint $table) use ($tableName) {
             $table->engine = 'InnoDB';
 
             //составной первичный ключ, чтобы не дублировались записи
-            $table->primary(['issue_id', 'component_jira_id']);
+            $table->primary(['issue_id', 'component_id']);
 
             $table->unsignedBigInteger('issue_id');
-            $table->unsignedBigInteger('component_jira_id');
+            $table->unsignedBigInteger('component_id');
 
-            $table->index(['issue_id'], 'fk_component_issue_jira_issues_id_idx');
-            $table->index(['component_jira_id'], 'fk_component_issue_jira_components_jira_id_idx');
+            $table->index(['issue_id'], 'fk_' . $tableName . '_jira_issues_issue_id_idx');
+            $table->index(['component_id'], 'fk_' . $tableName . '_jira_components_component_id_idx');
 
-            $table->foreign('component_jira_id', 'fk_component_issue_jira_components_id')
-                ->references('jira_id')
+            $table->foreign('component_id', 'fk_' . $tableName . '_jira_components_component_id')
+                ->references('component_id')
                 ->on('jira_components')
                 ->onDelete('cascade')
                 ->onUpdate('no action');
 
-            $table->foreign('issue_id', 'fk_component_issue_jira_issues_id')
-                ->references('id')
+            $table->foreign('issue_id', 'fk_'. $tableName .'_jira_issues_issue_id')
+                ->references('issue_id')
                 ->on('jira_issues')
                 ->onDelete('cascade')
                 ->onUpdate('no action');
