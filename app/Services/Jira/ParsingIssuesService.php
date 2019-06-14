@@ -281,10 +281,11 @@ class ParsingIssuesService
      */
     private function getComponentsFromJira(): array
     {
+        $components = [];
         $projectName = config('jira.project_name');
         try {
             $projectInfoObject = new ProjectService();
-            $project = $projectInfoObject->get($projectName);
+            $components = $projectInfoObject->get($projectName)->components;
         } catch (Exception $e) {
             $errorMsg = sprintf(
                 'Error fetch project info from jira. %s.  Class - %s, line - %d',
@@ -295,7 +296,25 @@ class ParsingIssuesService
             dd($errorMsg);
         }
 
-        return $project->components;
+        if (is_null($components)) {
+            $errorMsg = sprintf(
+                'Error fetching components project. $components is_null. Class - %s, line - %d',
+                __CLASS__,
+                __LINE__
+            );
+            dd($errorMsg);
+        }
+
+        if (count($components) === 0) {
+            $errorMsg = sprintf(
+                'Error fetching components project. Count = 0. Class - %s, line - %d',
+                __CLASS__,
+                __LINE__
+            );
+            dd($errorMsg);
+        }
+
+        return $components;
     }
 
     /**
@@ -351,7 +370,6 @@ class ParsingIssuesService
                                 'sender'    => $history->author->name,
                                 'sended_at' => Carbon::parse($history->created)->setTimezone('UTC')->addHours(2)
                             ];
-
                         }
                     }
                 }

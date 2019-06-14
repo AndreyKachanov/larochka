@@ -3,7 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\Email\ParseMailBoxCommand;
-use App\Console\Commands\Vk\ParsingPostsCommand;
+use App\Console\Commands\Jira\ParseIssuesCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -29,8 +29,8 @@ class Kernel extends ConsoleKernel
         $schedule->command(ParseMailBoxCommand::class)
             ->everyTenMinutes();
 
-        //$schedule->command(ParsingPostsCommand::class)
-        //    ->everyMinute();
+        $schedule->command(ParseIssuesCommand::class)
+            ->everyFiveMinutes();
     }
 
     /**
