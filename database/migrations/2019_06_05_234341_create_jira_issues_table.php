@@ -20,14 +20,16 @@ class CreateJiraIssuesTable extends Migration
                 $table->primary('issue_id');
 
                 $table->unsignedBigInteger('issue_id');
-                $table->unsignedInteger('key')->nullable();
+                $table->unsignedInteger('key');
                 $table->string('summary')->nullable();
                 $table->string('issue_type')->nullable();
-                $table->string('creator');
-                $table->string('assignee')->nullable();
                 $table->string('status')->nullable();
                 $table->string('resolution')->nullable();
-                $table->timestamp('created_in_jira')->nullable();
+                $table->string('creator');
+                $table->string('assignee')->nullable();
+                $table->string('sender')->nullable();
+                $table->timestamp('sended_at')->nullable();
+                $table->timestamp('created_at_jira');
                 $table->timestamps();
             });
         }

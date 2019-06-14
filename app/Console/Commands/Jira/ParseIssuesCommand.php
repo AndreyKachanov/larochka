@@ -2,12 +2,10 @@
 
 namespace App\Console\Commands\Jira;
 
-use App\Entity\Jira\Component;
 use App\Entity\Jira\Issue;
 use App\Services\Jira\ParsingIssuesService;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
+use JiraRestApi\Issue\Issue as JiraIssue;
 
 class ParseIssuesCommand extends Command
 {
@@ -51,10 +49,10 @@ class ParseIssuesCommand extends Command
         $fetchedCount = (int)config('jira.fetched_count');
         $projectName = config('jira.project_name');
 
-        //if ($fetchedCount <= 0 || $fetchedCount > 3000) {
-        //    $this->error("Value fetchedCount not must be <= 0 || >= 3000");
-        //    return false;
-        //}
+        if ($fetchedCount <= 0 || $fetchedCount > 10000) {
+            $this->error("Value fetchedCount not must be <= 0 || >= 10000");
+            return false;
+        }
 
         if ($projectName == "") {
             $this->error("Value in .env JIRA_PROJECT_NAME must be contain characters");
@@ -97,9 +95,14 @@ class ParseIssuesCommand extends Command
         $resultMsg = 'No new issues.';
         //извлекаем из джиры задачи
         $issues = $this->service->fetchDataFromJira($jql, $fetchedCount)->issues;
-        //dd($issues);
-        //dd($issues);
+
         if (count($issues) > 0) {
+            //Проверка ключа задач. Должен начинаться с HELP-, иначе всё накроется медным тазом...
+            if ($this->checkProjectKeyName($issues) === false) {
+                return false;
+            }
+
+
             $result = $this->service->insertToDatabase($issues);
             if ($result) {
                 $resultMsg = sprintf(
@@ -110,6 +113,27 @@ class ParseIssuesCommand extends Command
             }
         }
         $this->info($resultMsg);
+        return true;
+    }
+
+    /**
+     * @param array $issues
+     * @return bool
+     */
+    public function checkProjectKeyName(array $issues): bool
+    {
+        /** @var JiraIssue $issue */
+        foreach ($issues as $issue) {
+            if (strpos($issue->key, 'HELP-') !== 0) {
+                $errorMsg = sprintf(
+                    'Stop parsing!!! Issues key does not match HELP- . id=%s, key=%s',
+                    $issue->id,
+                    $issue->key
+                );
+                $this->error($errorMsg);
+                return false;
+            }
+        }
         return true;
     }
 }

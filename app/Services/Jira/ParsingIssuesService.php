@@ -13,6 +13,8 @@ use App\Entity\Jira\Issue;
 use App\Entity\Jira\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use JiraRestApi\Issue\ChangeLog;
+use JiraRestApi\Issue\History;
 use JiraRestApi\Issue\IssueSearchResult;
 use JiraRestApi\Issue\IssueService;
 use JiraRestApi\Issue\Issue as JiraIssue;
@@ -73,7 +75,6 @@ class ParsingIssuesService
         //подготовленный массив отсутствующих в бд компонентов
         $components = $this->convertComponents($componentsJiraObj);
 
-
         try {
             DB::transaction(function () use ($users, $components, $issues) {
                 if (count($users) > 0) {
@@ -86,17 +87,26 @@ class ParsingIssuesService
                 }
                 /** @var JiraIssue $item */
                 foreach ($issues as $item) {
+                    //dd($item);
                     //создаем сущность Issue и записываем в бд
                     $issue = new Issue();
                     $issue->issue_id = (int)$item->id;
                     $issue->key = ($item->key === null) ? null : $this->getCutKey($item->key);
                     $issue->summary = $item->fields->summary;
                     $issue->issue_type = $item->fields->issuetype->name;
-                    $issue->creator = $item->fields->creator->name;
-                    $issue->assignee = $item->fields->assignee->name ?? null;
                     $issue->status = $item->fields->status->name;
                     $issue->resolution = $item->fields->resolution->name ?? null;
-                    $issue->created_in_jira = Carbon::instance($item->fields->created)->addHours(3);
+                    $issue->creator = $item->fields->creator->name;
+                    $issue->assignee = $item->fields->assignee->name ?? null;
+                    $issue->sender = ($item->changelog === null)
+                        ? null
+                        : $this->getSenderInfo($item->changelog)['sender'];
+                    $issue->sended_at = ($item->changelog === null)
+                        ? null
+                        : $this->getSenderInfo($item->changelog)['sended_at'];
+                    $issue->created_at_jira = Carbon::instance($item->fields->created)->addHours(3);
+
+                    //dd($issue);
                     $issue->save();
 
                     $componentsFromJira = $item->fields->components;
@@ -153,7 +163,7 @@ class ParsingIssuesService
         ];
 
         $expand = [
-            //'changelog'
+            'changelog'
         ];
 
         try {
@@ -180,6 +190,7 @@ class ParsingIssuesService
         $users = [];
         $allUsers = [];
 
+        /** @var JiraIssue $issue */
         foreach ($issues as $issue) {
             if ($issue->fields->creator != null) {
                 $allUsers[] = $issue->fields->creator;
@@ -188,10 +199,18 @@ class ParsingIssuesService
             if ($issue->fields->assignee != null) {
                 $allUsers[] = $issue->fields->assignee;
             }
+
+            if ($issue->changelog->total > 0) {
+                $usersFromChangelog = $this->getUsersFromChangelog($issue->changelog);
+                //dump($usersFromChangelog);
+                $allUsers = array_merge($allUsers, $usersFromChangelog);
+            }
+
+            //dd($allUsers);
         }
+        //dd($allUsers);
         //удаляем дубликаты из массива объектов
         $withoutDuplicates = $this->removeDuplicateValues($allUsers);
-
         //перебор массива объектов - если в бд уже есть пользователя, исключаем его из массива
         $checkInDb = array_filter($withoutDuplicates, function (Reporter $obj) {
             return !$this->checkUserFromDb($obj->name);
@@ -310,5 +329,50 @@ class ParsingIssuesService
     private function getCutKey(string $item): int
     {
         return (int)explode('HELP-', $item)[1];
+    }
+
+    /**
+     * @param ChangeLog $changeLog
+     * @return array
+     */
+    private function getSenderInfo(ChangeLog $changeLog): array
+    {
+        $arr = [
+            'sender'    => null,
+            'sended_at' => null
+        ];
+        if ($changeLog->total > 0) {
+            /** @var History $history */
+            foreach ($changeLog->histories as $history) {
+                foreach ($history->items as $item) {
+                    if (isset($item->toString)) {
+                        if ($item->toString === "Черга для L2") {
+                            return [
+                                'sender'    => $history->author->name,
+                                'sended_at' => Carbon::parse($history->created)->setTimezone('UTC')->addHours(2)
+                            ];
+
+                        }
+                    }
+                }
+            }
+        }
+
+        return $arr;
+    }
+
+    /**
+     * @param ChangeLog $changeLog
+     * @return array
+     */
+    private function getUsersFromChangelog(ChangeLog $changeLog): array
+    {
+        $users = [];
+        /** @var History $history */
+        foreach ($changeLog->histories as $history) {
+            $users[] = $history->author;
+        }
+
+        return $users;
     }
 }
