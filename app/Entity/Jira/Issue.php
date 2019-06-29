@@ -38,6 +38,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereSummary($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \App\Entity\Jira\Creator $rCreator
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Entity\Jira\Component[] $rComponents
+ * @property-read \App\Entity\Jira\Creator|null $rAssignee
  */
 class Issue extends Model
 {
@@ -53,8 +56,18 @@ class Issue extends Model
         'created_in_jira' => 'datetime'
     ];
 
-    public function components()
+    public function rComponents()
     {
         return $this->belongsToMany(Component::class, 'jira_component_issue', 'issue_id', 'component_id');
+    }
+
+    public function rCreator()
+    {
+        return $this->belongsTo(Creator::class, 'creator', 'user_key');
+    }
+
+    public function rAssignee()
+    {
+        return $this->belongsTo(Creator::class, 'assignee', 'user_key');
     }
 }

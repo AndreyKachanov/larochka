@@ -67,14 +67,14 @@
 
             @section('search')
                 {{--Search block--}}
-                @include('layouts.partials.search')
+{{--                @include('layouts.partials.search')--}}
             @show
         </header>
 
         <main class="app-content py-3">
             <div class="container">
-                {{--@section('breadcrumbs', Breadcrumbs::render())--}}
-                {{--@yield('breadcrumbs')--}}
+                @section('breadcrumbs', Breadcrumbs::render())
+                @yield('breadcrumbs')
                 @include('layouts.partials.flash')
                 @yield('content')
             </div>

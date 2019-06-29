@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Entity\Jira\Issue[] $issues
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Entity\Jira\Issue[] $jira
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component query()
@@ -20,6 +20,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Component whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Entity\Jira\Issue[] $issues
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Entity\Jira\Issue[] $rIssues
  */
 class Component extends Model
 {
@@ -31,7 +33,7 @@ class Component extends Model
 
     protected $guarded = ['component_id'];
 
-    public function issues()
+    public function rIssues()
     {
         return $this->belongsToMany(Issue::class, 'jira_component_issue', 'component_id', 'issue_id');
     }

@@ -83,15 +83,34 @@ Breadcrumbs::register('admin.users.edit', function (Crumbs $crumbs, User $user) 
 // Cabinet messages
 Breadcrumbs::register('cabinet.messages.index', function (Crumbs $crumbs) {
     $crumbs->parent('cabinet.home');
-    $crumbs->push('Messages', route('cabinet.messages.index'));
+    $crumbs->push('Outlook', route('cabinet.messages.index'));
 });
 
-// Chat
-Breadcrumbs::register('chat', function (Crumbs $crumbs) {
-    $crumbs->push('Chat', route('chat'));
+//VK Parser
+
+Breadcrumbs::register('cabinet.currencies.index', function (Crumbs $crumbs) {
+    $crumbs->parent('cabinet.home');
+    $crumbs->push('Vk parser', route('cabinet.currencies.index'));
 });
 
-//// Chat
-//Breadcrumbs::register('room', function (Crumbs $crumbs, $room) {
-//    $crumbs->push('Room' . $room, route('room'));
-//});
+
+// Jira
+Breadcrumbs::register('cabinet.jira.home', function (Crumbs $crumbs) {
+    $crumbs->parent('cabinet.home');
+    $crumbs->push('Jira', route('cabinet.jira.home'));
+});
+
+Breadcrumbs::register('cabinet.jira.creators', function (Crumbs $crumbs) {
+    $crumbs->parent('cabinet.jira.home');
+    $crumbs->push('Creators', route('cabinet.jira.creators'));
+});
+
+Breadcrumbs::register('cabinet.jira.operators', function (Crumbs $crumbs) {
+    $crumbs->parent('cabinet.jira.home');
+    $crumbs->push('Operators', route('cabinet.jira.operators'));
+});
+
+Breadcrumbs::register('cabinet.jira.issues', function (Crumbs $crumbs) {
+    $crumbs->parent('cabinet.jira.home');
+    $crumbs->push('Issues', route('cabinet.jira.issues'));
+});

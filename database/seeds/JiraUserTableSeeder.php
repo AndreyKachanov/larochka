@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Entity\Jira\User;
+use App\Entity\Jira\Creator;
 
 class JiraUserTableSeeder extends Seeder
 {
@@ -13,14 +13,14 @@ class JiraUserTableSeeder extends Seeder
     public function run()
     {
         if (App::environment('local')) {
-            if (User::count() == 0) {
-                User::create([
+            if (Creator::count() == 0) {
+                Creator::create([
                     'user_key'     => 'a.kachanov',
                     'display_name' => 'Андрей Качанов',
                     'email'        => 'test@test.loc',
                     'avatar'       => 'https://sd.court.gov.ua/secure/useravatar?ownerId=a.kachanov&avatarId=11910',
                 ]);
-                User::create([
+                Creator::create([
                     'user_key'     => 'chumak',
                     'display_name' => 'Фудор Чумак',
                     'email'        => 'test@test1.loc',

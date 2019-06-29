@@ -27,10 +27,14 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command(ParseMailBoxCommand::class)
+            ->withoutOverlapping(9)
             ->everyTenMinutes();
 
         $schedule->command(ParseIssuesCommand::class)
-            ->everyFiveMinutes();
+            ->everyFiveMinutes()
+            ->withoutOverlapping(4)
+            ->appendOutputTo(storage_path('logs/schedule-parse_issues_command.log'))
+            ->emailOutputOnFailure('andrey170749@yandex.ru');
     }
 
     /**

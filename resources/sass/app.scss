@@ -67,3 +67,28 @@ body {
     min-height: 50vh;
   }
 }
+
+.nav-item.active>.nav-link, .navbar.navbar-dark .navbar-nav .nav-item.active>.nav-link {
+  background-color: rgba(255,255,255,.1);
+}
+
+.waves-effect {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-link {
+  display: block;
+  padding: .35rem 1rem;
+}
+
+.navbar-jira {
+  background-color: #495057;
+  padding: .5rem 1rem;
+}

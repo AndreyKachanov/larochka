@@ -26,7 +26,7 @@ class TestSeeder extends Seeder
                 }, 5);
             } catch (Exception $e) {
                 $errorMsg = sprintf(
-                    'Error insert to database issues or users. %s.  Class - %s, line - %d',
+                    'Error insert to database jira or users. %s.  Class - %s, line - %d',
                     $e->getMessage(),
                     __CLASS__,
                     __LINE__

@@ -19,8 +19,8 @@ Route::get('/test123', function () {
         $pagination = -1;
 
         $startAt = 0;	//the index of the first issue to return (0-based)
-        $maxResult = 5;	// the maximum number of issues to return (defaults to 50).
-        $totalCount = -1;	// the number of issues to return
+        $maxResult = 5;	// the maximum number of jira to return (defaults to 50).
+        $totalCount = -1;	// the number of jira to return
         // first fetch
         $ret = $issueService->search(
             $jql,
@@ -85,6 +85,36 @@ Route::get('/test234', function () {
     dump(\Illuminate\Support\Carbon::now()->subDays(10)->startOfDay());
 })->name('test234');
 
+Route::get('/test345', function () {
+    try {
+        $proj = new ProjectService();
+
+        $prjs = $proj->getAllProjects();
+        dd($prjs);
+
+        foreach ($prjs as $p) {
+            echo sprintf("Project Key:%s, Id:%s, Name:%s, projectCategory: %s\n",
+                $p->key, $p->id, $p->name, $p->projectCategory['name']
+            );
+        }
+    } catch (JiraException $e) {
+        print("Error Occured! " . $e->getMessage());
+    }
+})->name('test345');
+
+Route::get('/test678', function () {
+    try {
+        $us = new \JiraRestApi\User\UserService();
+
+        $user = $us->get(['username' => 'a.kachanov']);
+
+        dd($user);
+    } catch (JiraException $e) {
+        print("Error Occured! " . $e->getMessage());
+    }
+})->name('test678');
+
+
 Route::get('/test', 'TestController@test')->name('test');
 //Route::get('/test3', 'TestController@test3')->name('test3');
 
@@ -121,6 +151,13 @@ Route::group(
         Route::resource('messages', 'MessageController')->only(['index']);
         Route::resource('currencies', 'VkParsingPostsController')->only(['index']);
 
+        Route::group(['prefix' => 'jira', 'as' => 'jira.'], function () {
+            Route::get('/', 'Jira\IndexController@index')->name('home');
+
+            Route::get('issues', 'Jira\IssuesController@index')->name('issues');
+            Route::get('creators', 'Jira\CreatorsController@index')->name('creators');
+            Route::get('operators', 'Jira\OperatorsController@index')->name('operators');
+        });
 
         Route::post('parse', 'VkParsingPostsController@parse')->name('parse');
 
@@ -151,10 +188,5 @@ Route::post('messages', function (Illuminate\Http\Request $request) {
 Route::get('/room/{room}', function (App\Entity\Chat\Room $room) {
     return view('room', ['room' => $room]);
 })->middleware('auth')->name('room');
-
-//Route::get('/chat', function () {
-//    return view('chat');
-//})->name('chat');
-
 
 Route::view('/chat', 'chat')->name('chat');

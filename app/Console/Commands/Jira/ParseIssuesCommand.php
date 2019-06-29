@@ -5,6 +5,8 @@ namespace App\Console\Commands\Jira;
 use App\Entity\Jira\Issue;
 use App\Services\Jira\ParsingIssuesService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use JiraRestApi\Issue\Issue as JiraIssue;
 
 class ParseIssuesCommand extends Command
@@ -44,8 +46,6 @@ class ParseIssuesCommand extends Command
      */
     public function handle(): bool
     {
-        //dd(Issue::find(102)->components()->attach(2));
-
         $fetchedCount = (int)config('jira.fetched_count');
         $projectName = config('jira.project_name');
 
@@ -92,11 +92,13 @@ class ParseIssuesCommand extends Command
      */
     private function handleIssues(string $jql, int $fetchedCount): bool
     {
-        $resultMsg = 'No new issues.';
+        $resultMsg = '[' . Carbon::now()->toDateTimeString() . ']. ' . 'No new issues.';
         //извлекаем из джиры задачи
         $issues = $this->service->fetchDataFromJira($jql, $fetchedCount)->issues;
+        dd($issues);
 
-        if (count($issues) > 0) {
+        $countIssues = count($issues);
+        if ($countIssues > 0) {
             //Проверка ключа задач. Должен начинаться с HELP-, иначе всё накроется медным тазом...
             if ($this->checkProjectKeyName($issues) === false) {
                 return false;
@@ -106,8 +108,9 @@ class ParseIssuesCommand extends Command
             $result = $this->service->insertToDatabase($issues);
             if ($result) {
                 $resultMsg = sprintf(
-                    '%d issues are inserted into the database. Total count in database - %d.',
-                    $fetchedCount,
+                    '[%s]. %d issues are inserted into the database. Total count in database - %d.',
+                    Carbon::now()->toDateTimeString(),
+                    $countIssues,
                     $this->service->getTotalIssuesInDb()
                 );
             }
@@ -126,7 +129,8 @@ class ParseIssuesCommand extends Command
         foreach ($issues as $issue) {
             if (strpos($issue->key, 'HELP-') !== 0) {
                 $errorMsg = sprintf(
-                    'Stop parsing!!! Issues key does not match HELP- . id=%s, key=%s',
+                    '[%s]. Stop parsing!!! Issues key does not match HELP- . id=%s, key=%s',
+                    Carbon::now()->toDateTimeString(),
                     $issue->id,
                     $issue->key
                 );

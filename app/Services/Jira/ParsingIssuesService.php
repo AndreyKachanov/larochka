@@ -10,7 +10,7 @@ namespace App\Services\Jira;
 
 use App\Entity\Jira\Component;
 use App\Entity\Jira\Issue;
-use App\Entity\Jira\User;
+use App\Entity\Jira\Creator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use JiraRestApi\Issue\ChangeLog;
@@ -79,7 +79,7 @@ class ParsingIssuesService
             DB::transaction(function () use ($users, $components, $issues) {
                 if (count($users) > 0) {
                     //dump($users);
-                    User::insert($users);
+                    Creator::insert($users);
                 }
                 if (count($components) > 0) {
                     //dump($components);
@@ -117,13 +117,14 @@ class ParsingIssuesService
                             $arrToSync[] = (int)$comp->id;
                         }
                         //dd($arrToSync);
-                        $issue->components()->sync($arrToSync);
+                        $issue->rComponents()->sync($arrToSync);
                     }
                 }
             }, 5);
         } catch (Exception $e) {
             $errorMsg = sprintf(
-                'Error insert to database issues or users. %s.  Class - %s, line - %d',
+                '[%s]. Error insert to database jira or users. %s.  Class - %s, line - %d',
+                Carbon::now()->toDateTimeString(),
                 $e->getMessage(),
                 __CLASS__,
                 __LINE__
@@ -159,7 +160,8 @@ class ParsingIssuesService
             'status',
             'resolution',
             'components',
-            'created'
+            'created',
+            'project'
         ];
 
         $expand = [
@@ -171,7 +173,8 @@ class ParsingIssuesService
             $result = $issueService->search($jql, $startAt, $maxResult, $fields, $expand);
         } catch (Exception $e) {
             $errorMsg = sprintf(
-                'Error fetch issues from jira. %s.  Class - %s, line - %d',
+                '[%s]. Error fetch issues from jira. %s.  Class - %s, line - %d',
+                Carbon::now()->toDateTimeString(),
                 $e->getMessage(),
                 __CLASS__,
                 __LINE__
@@ -192,6 +195,7 @@ class ParsingIssuesService
 
         /** @var JiraIssue $issue */
         foreach ($issues as $issue) {
+            //dd($issue);
             if ($issue->fields->creator != null) {
                 $allUsers[] = $issue->fields->creator;
             }
@@ -241,7 +245,7 @@ class ParsingIssuesService
      */
     private function checkUserFromDb(string $userKey): bool
     {
-        return User::whereUserKey($userKey)->count();
+        return Creator::whereUserKey($userKey)->count();
     }
 
     /**
@@ -288,7 +292,8 @@ class ParsingIssuesService
             $components = $projectInfoObject->get($projectName)->components;
         } catch (Exception $e) {
             $errorMsg = sprintf(
-                'Error fetch project info from jira. %s.  Class - %s, line - %d',
+                '[%s]. Error fetch project info from jira. %s.  Class - %s, line - %d',
+                Carbon::now()->toDateTimeString(),
                 $e->getMessage(),
                 __CLASS__,
                 __LINE__
@@ -298,7 +303,8 @@ class ParsingIssuesService
 
         if (is_null($components)) {
             $errorMsg = sprintf(
-                'Error fetching components project. $components is_null. Class - %s, line - %d',
+                '[%s]. Error fetching components project. $components is_null. Class - %s, line - %d',
+                Carbon::now()->toDateTimeString(),
                 __CLASS__,
                 __LINE__
             );
@@ -307,7 +313,8 @@ class ParsingIssuesService
 
         if (count($components) === 0) {
             $errorMsg = sprintf(
-                'Error fetching components project. Count = 0. Class - %s, line - %d',
+                '[%s]. Error fetching components project. Count = 0. Class - %s, line - %d',
+                Carbon::now()->toDateTimeString(),
                 __CLASS__,
                 __LINE__
             );
