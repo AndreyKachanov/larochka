@@ -1,5 +1,5 @@
 @php
-    /** @var \App\Entity\Jira\Creator $creator */
+    /** @var \App\Entity\Jira\User $creator */
     /** @var \Illuminate\Pagination\LengthAwarePaginator $creators */
 @endphp
 

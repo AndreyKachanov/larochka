@@ -38,9 +38,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereSummary($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereUpdatedAt($value)
  * @mixin \Eloquent
- * @property-read \App\Entity\Jira\Creator $rCreator
+ * @property-read \App\Entity\Jira\User $rUser
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Entity\Jira\Component[] $rComponents
- * @property-read \App\Entity\Jira\Creator|null $rAssignee
+ * @property-read \App\Entity\Jira\User|null $rAssignee
  * @property int $project_id
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereProjectId($value)
  * @property-read \App\Entity\Jira\Project $rProject
@@ -64,14 +64,14 @@ class Issue extends Model
         return $this->belongsToMany(Component::class, 'jira_component_issue', 'issue_id', 'component_id');
     }
 
-    public function rCreator()
+    public function rUser()
     {
-        return $this->belongsTo(Creator::class, 'creator', 'user_key');
+        return $this->belongsTo(User::class, 'creator', 'user_key');
     }
 
     public function rAssignee()
     {
-        return $this->belongsTo(Creator::class, 'assignee', 'user_key');
+        return $this->belongsTo(User::class, 'assignee', 'user_key');
     }
 
     public function rProject()

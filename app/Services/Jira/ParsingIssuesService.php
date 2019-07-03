@@ -10,7 +10,7 @@ namespace App\Services\Jira;
 
 use App\Entity\Jira\Component;
 use App\Entity\Jira\Issue;
-use App\Entity\Jira\Creator;
+use App\Entity\Jira\User;
 use App\Entity\Jira\Project;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -92,7 +92,7 @@ class ParsingIssuesService
             DB::transaction(function () use ($users, $components, $issues, $projectName) {
                 if (count($users) > 0) {
                     //dump($users);
-                    Creator::insert($users);
+                    User::insert($users);
                 }
 
                 if (count($components) > 0) {
@@ -312,7 +312,7 @@ class ParsingIssuesService
      */
     private function checkUserFromDb(string $userKey): bool
     {
-        return Creator::whereUserKey($userKey)->count();
+        return User::whereUserKey($userKey)->count();
     }
 
     /**

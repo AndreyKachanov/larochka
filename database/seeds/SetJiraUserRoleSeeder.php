@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Entity\Jira\Creator;
+use App\Entity\Jira\User;
 use Illuminate\Support\Carbon;
 
 //@codingStandardsIgnoreLine
@@ -35,15 +35,15 @@ class SetJiraUserRoleSeeder extends Seeder
         try {
             DB::transaction(function () use ($line1, $line2) {
                 //проставляем роли для l1
-                if (Creator::whereIn('user_key', $line1)->count() > 0) {
-                    Creator::whereIn('user_key', $line1)->update(['role_id' => 2]);
+                if (User::whereIn('user_key', $line1)->count() > 0) {
+                    User::whereIn('user_key', $line1)->update(['role_id' => 2]);
                 }
                 //проставляем роли для l2
-                if (Creator::whereIn('user_key', $line2)->count() > 0) {
-                    Creator::whereIn('user_key', $line2)->update(['role_id' => 3]);
+                if (User::whereIn('user_key', $line2)->count() > 0) {
+                    User::whereIn('user_key', $line2)->update(['role_id' => 3]);
                 }
                 //проставляем проли для обычных юзеров
-                Creator::whereNull('role_id')->update(['role_id' => 1]);
+                User::whereNull('role_id')->update(['role_id' => 1]);
             }, 5);
         } catch (Exception $e) {
             $errorMsg = sprintf(

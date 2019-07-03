@@ -9,7 +9,7 @@
 namespace App\Http\Controllers\Cabinet\Jira;
 
 use App\Entity\Jira\Component;
-use App\Entity\Jira\Creator;
+use App\Entity\Jira\User;
 use App\Entity\Jira\Issue;
 use App\Entity\Jira\Line;
 use App\Entity\Jira\Operator;
@@ -26,7 +26,7 @@ class IssuesController extends Controller
         //$issues = Issue::with('rAssignee.rOperator.rLine')->get();
 
         Issue::whereHas('rAssignee', function ($creator) {
-            /** @var Creator $creator */
+            /** @var User $creator */
             $creator->whereUserKey('a.kachanov');
             $creator->whereHas('rOperator', function ($operator) {
                 /** @var Operator $operator */

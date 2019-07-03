@@ -8,7 +8,7 @@
 
 namespace App\Http\Controllers\Cabinet\Jira;
 
-use App\Entity\Jira\Creator;
+use App\Entity\Jira\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -16,7 +16,7 @@ class CreatorsController extends Controller
 {
     public function index()
     {
-        //$query = Creator::orderBy('user_key');
+        //$query = User::orderBy('user_key');
         //
         //if (!empty($value = $request->get('user_key'))) {
         //    $query->where('user_key', $value);
@@ -30,7 +30,7 @@ class CreatorsController extends Controller
         //    $query->where('email', $value);
         //}
 
-        $creators =  Creator::orderBy('user_key')->paginate(25);
+        $creators =  User::orderBy('user_key')->paginate(25);
 
         return view('cabinet.jira.creators.index', compact(
             'creators'
