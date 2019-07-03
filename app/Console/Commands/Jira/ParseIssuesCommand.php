@@ -6,7 +6,6 @@ use App\Services\Jira\ParsingIssuesService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
-use JiraRestApi\Issue\Issue as JiraIssue;
 use SetJiraUserRoleSeeder;
 use JiraUserRolesSeeder;
 use App\Entity\Jira\Issue;
@@ -56,40 +55,32 @@ class ParseIssuesCommand extends Command
             return false;
         }
 
-        if ($projectName == "") {
-            $this->error("Value in .env JIRA_PROJECT_NAME must be contain characters");
+        if ($projectName !== "HELP") {
+            $this->error("Value in .env JIRA_PROJECT_NAME must be contain HELP");
             return false;
         }
 
         //запускаем сидер для установки ролей пользователей в бд
         Artisan::call('db:seed', ['--class' => JiraUserRolesSeeder::class]);
 
-        //Извлекаем из джиры все проекты и записываем в бд
+        //Извлекаем из джиры все проекты и записываем в бд (если появляются новые проекты - они дописываются в бд)
         $this->service->handleProjectsInfo();
 
         //обработка задач в проекте HelpDesk
         $result = false;
         //если бд пуcтая
-        if (Issue::count() == 0) {
-            $totalCountIssues = $this->service->getTotalCountIssues($projectName);
+        if (Issue::count() === 0) {
+            $totalCountIssues = $this->service->getTotalCountIssues();
             if ($totalCountIssues > 0) {
                 //извлекаем первые задачи
-                $jql = sprintf(
-                    'project = %s ORDER BY key ASC',
-                    $projectName
-                );
+                $jql = 'order by created ASC';
                 $result = $this->handleIssues($jql, $fetchedCount);
             }
         //если в бд есть записи - дополняем новыми задачами из джиры
         } else {
-            $lastIssueKey = Issue::orderByDesc('key')->first()->key;
-            $jql = sprintf(
-                'project = %s AND key > HELP-%s ORDER BY key ASC',
-                $projectName,
-                $lastIssueKey
-            );
-
-            $result = $this->handleIssues($jql, $fetchedCount);
+            $countIssuesFromDb = Issue::count();
+            $jql = 'order by created ASC';
+            $result = $this->handleIssues($jql, $fetchedCount, $countIssuesFromDb);
         }
 
         //запускаем сидер для проставления ролей пользователям
@@ -101,10 +92,11 @@ class ParseIssuesCommand extends Command
     /**
      * @param string $jql
      * @param int $fetchedCount
+     * @param int $startAt
      * @return bool
      * @throws \Throwable
      */
-    private function handleIssues(string $jql, int $fetchedCount): bool
+    private function handleIssues(string $jql, int $fetchedCount, $startAt = 0): bool
     {
         $resultMsg = '[' . Carbon::now()->toDateTimeString() . ']. ' . 'No new issues.';
 
@@ -126,15 +118,10 @@ class ParseIssuesCommand extends Command
             'changelog'
         ];
 
-        $issues = $this->service->fetchDataFromJira($jql, $fetchedCount, $fields, $expand)->issues;
+        $issues = $this->service->fetchDataFromJira($jql, $fetchedCount, $fields, $expand, $startAt)->issues;
         //dd($issues);
         $countIssues = count($issues);
         if ($countIssues > 0) {
-            //Проверка ключа задач. Должен начинаться с HELP-, иначе всё накроется медным тазом...
-            if ($this->checkProjectKeyName($issues) === false) {
-                return false;
-            }
-
             $result = $this->service->insertToDatabase($issues);
             if ($result) {
                 $resultMsg = sprintf(
@@ -146,28 +133,6 @@ class ParseIssuesCommand extends Command
             }
         }
         $this->info($resultMsg);
-        return true;
-    }
-
-    /**
-     * @param array $issues
-     * @return bool
-     */
-    public function checkProjectKeyName(array $issues): bool
-    {
-        /** @var JiraIssue $issue */
-        foreach ($issues as $issue) {
-            if (strpos($issue->key, 'HELP-') !== 0) {
-                $errorMsg = sprintf(
-                    '[%s]. Stop parsing!!! Issues key does not match HELP- . id=%s, key=%s',
-                    Carbon::now()->toDateTimeString(),
-                    $issue->id,
-                    $issue->key
-                );
-                $this->error($errorMsg);
-                return false;
-            }
-        }
         return true;
     }
 }
