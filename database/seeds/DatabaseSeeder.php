@@ -12,8 +12,6 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(UserTableSeeder::class);
-        $this->call(JiraOperatorLinesTableSeeder::class);
-        $this->call(JiraOperatorsTableSeeder::class);
         //$this->call(JiraUserTableSeeder::class);
         //$this->call(JiraComponentSeeder::class);
         //$this->call(JiraIssueTableSeeder::class);
