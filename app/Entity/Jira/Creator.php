@@ -26,12 +26,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Entity\Jira\Issue[] $issues
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Entity\Jira\Issue[] $rIssues
  * @property-read \App\Entity\Jira\Operator $rOperator
+ * @property int $role_id
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Creator whereRoleId($value)
  */
 class Creator extends Model
 {
     public $incrementing = false;
 
-    protected $table = 'jira_creators';
+    protected $table = 'jira_users';
 
     protected $primaryKey = 'user_key';
 

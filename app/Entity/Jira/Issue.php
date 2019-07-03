@@ -41,6 +41,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Entity\Jira\Creator $rCreator
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Entity\Jira\Component[] $rComponents
  * @property-read \App\Entity\Jira\Creator|null $rAssignee
+ * @property int $project_id
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereProjectId($value)
+ * @property-read \App\Entity\Jira\Project $rProject
  */
 class Issue extends Model
 {
@@ -69,5 +72,10 @@ class Issue extends Model
     public function rAssignee()
     {
         return $this->belongsTo(Creator::class, 'assignee', 'user_key');
+    }
+
+    public function rProject()
+    {
+        return $this->belongsTo(Project::class, 'project_id', 'project_id');
     }
 }

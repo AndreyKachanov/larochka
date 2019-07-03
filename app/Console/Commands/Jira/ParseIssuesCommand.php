@@ -2,12 +2,14 @@
 
 namespace App\Console\Commands\Jira;
 
-use App\Entity\Jira\Issue;
 use App\Services\Jira\ParsingIssuesService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
 use JiraRestApi\Issue\Issue as JiraIssue;
+use SetJiraUserRoleSeeder;
+use JiraUserRolesSeeder;
+use App\Entity\Jira\Issue;
 
 class ParseIssuesCommand extends Command
 {
@@ -59,6 +61,14 @@ class ParseIssuesCommand extends Command
             return false;
         }
 
+        //запускаем сидер для установки ролей пользователей в бд
+        Artisan::call('db:seed', ['--class' => JiraUserRolesSeeder::class]);
+
+        //Извлекаем из джиры все проекты и записываем в бд
+        $this->service->handleProjectsInfo();
+
+        //обработка задач в проекте HelpDesk
+        $result = false;
         //если бд пуcтая
         if (Issue::count() == 0) {
             $totalCountIssues = $this->service->getTotalCountIssues($projectName);
@@ -68,7 +78,7 @@ class ParseIssuesCommand extends Command
                     'project = %s ORDER BY key ASC',
                     $projectName
                 );
-                return $this->handleIssues($jql, $fetchedCount);
+                $result = $this->handleIssues($jql, $fetchedCount);
             }
         //если в бд есть записи - дополняем новыми задачами из джиры
         } else {
@@ -79,9 +89,13 @@ class ParseIssuesCommand extends Command
                 $lastIssueKey
             );
 
-            return $this->handleIssues($jql, $fetchedCount);
+            $result = $this->handleIssues($jql, $fetchedCount);
         }
-        return false;
+
+        //запускаем сидер для проставления ролей пользователям
+        Artisan::call('db:seed', ['--class' => SetJiraUserRoleSeeder::class]);
+
+        return $result;
     }
 
     /**
@@ -93,17 +107,33 @@ class ParseIssuesCommand extends Command
     private function handleIssues(string $jql, int $fetchedCount): bool
     {
         $resultMsg = '[' . Carbon::now()->toDateTimeString() . ']. ' . 'No new issues.';
-        //извлекаем из джиры задачи
-        $issues = $this->service->fetchDataFromJira($jql, $fetchedCount)->issues;
-        dd($issues);
 
+        //извлекаем из джиры задачи
+        $fields = [
+            //'*all',
+            'summary',
+            'issuetype',
+            'creator',
+            'assignee',
+            'status',
+            'resolution',
+            'components',
+            'created',
+            'project'
+        ];
+
+        $expand = [
+            'changelog'
+        ];
+
+        $issues = $this->service->fetchDataFromJira($jql, $fetchedCount, $fields, $expand)->issues;
+        //dd($issues);
         $countIssues = count($issues);
         if ($countIssues > 0) {
             //Проверка ключа задач. Должен начинаться с HELP-, иначе всё накроется медным тазом...
             if ($this->checkProjectKeyName($issues) === false) {
                 return false;
             }
-
 
             $result = $this->service->insertToDatabase($issues);
             if ($result) {

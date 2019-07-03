@@ -29,7 +29,7 @@ class CreateJiraIssuesTable extends Migration
                 $table->string('assignee')->nullable();
                 $table->string('sender')->nullable();
                 $table->timestamp('sended_at')->nullable();
-                $table->timestamp('created_at_jira');
+                $table->timestamp('created_at_jira')->nullable();
                 $table->timestamps();
             });
         }

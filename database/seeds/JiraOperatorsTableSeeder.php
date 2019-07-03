@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Entity\Jira\Operator;
+use App\Entity\Jira\Line;
 
 class JiraOperatorsTableSeeder extends Seeder
 {

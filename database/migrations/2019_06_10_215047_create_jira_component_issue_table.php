@@ -27,17 +27,17 @@ class CreateJiraComponentIssueTable extends Migration
             $table->index(['issue_id'], 'fk_' . $tableName . '_jira_issues_issue_id_idx');
             $table->index(['component_id'], 'fk_' . $tableName . '_jira_components_component_id_idx');
 
-            $table->foreign('component_id', 'fk_' . $tableName . '_jira_components_component_id')
-                ->references('component_id')
-                ->on('jira_components')
-                ->onDelete('cascade')
-                ->onUpdate('no action');
-
-            $table->foreign('issue_id', 'fk_'. $tableName .'_jira_issues_issue_id')
-                ->references('issue_id')
-                ->on('jira_issues')
-                ->onDelete('cascade')
-                ->onUpdate('no action');
+            //$table->foreign('component_id', 'fk_' . $tableName . '_jira_components_component_id')
+            //    ->references('component_id')
+            //    ->on('jira_components')
+            //    ->onDelete('set null')
+            //    ->onUpdate('no action');
+            //
+            //$table->foreign('issue_id', 'fk_'. $tableName .'_jira_issues_issue_id')
+            //    ->references('issue_id')
+            //    ->on('jira_issues')
+            //    ->onDelete('set null')
+            //    ->onUpdate('no action');
         });
     }
 

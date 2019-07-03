@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 //@codingStandardsIgnoreLine
-class RenameJiraUsersTable extends Migration
+class AddsJiraUsersRoleTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,11 @@ class RenameJiraUsersTable extends Migration
      */
     public function up()
     {
-        Schema::rename('jira_users', 'jira_creators');
+        Schema::create('jira_users_role', function (Blueprint $table) {
+            $table->smallIncrements('role_id');
+            $table->string('name', 255)->nullable();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -24,6 +28,6 @@ class RenameJiraUsersTable extends Migration
      */
     public function down()
     {
-        Schema::rename('jira_creators', 'jira_users');
+        Schema::dropIfExists('jira_users_role');
     }
 }

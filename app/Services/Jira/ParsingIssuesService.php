@@ -11,6 +11,9 @@ namespace App\Services\Jira;
 use App\Entity\Jira\Component;
 use App\Entity\Jira\Issue;
 use App\Entity\Jira\Creator;
+use App\Entity\Jira\Operator;
+use App\Entity\Jira\Project;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use JiraRestApi\Issue\ChangeLog;
@@ -48,49 +51,60 @@ class ParsingIssuesService
      * @param int $fetchedCount
      * @return IssueSearchResult
      */
-    public function fetchDataFromJira(string $jql, int $fetchedCount): IssueSearchResult
+    public function fetchDataFromJira(string $jql, int $fetchedCount, array $fields, array $expand): IssueSearchResult
     {
         $startAt = 0;
         $maxResult = $fetchedCount;
+
         return $this->search(
             $jql,
             $startAt,
-            $maxResult
+            $maxResult,
+            $fields,
+            $expand
         );
     }
 
     /**
      * @param array $issues
+     * @param bool $insertForAllProjects
      * @return bool
      * @throws \Throwable
      */
-    public function insertToDatabase(array $issues): bool
+    public function insertToDatabase(array $issues, bool $insertForAllProjects = false): bool
     {
+        //если передан флаг что нужно записывать компоненты в бд
         //получаем компоненты с джиры
-        $componentsJiraObj = $this->getComponentsFromJira();
+        if ($insertForAllProjects === false) {
+            $componentsJiraObj = $this->getComponentsFromJira();
+            //подготовленный массив отсутствующих в бд компонентов
+            $components = $this->convertComponents($componentsJiraObj);
+        } else {
+            $components = [];
+        }
 
         //подготовленный массив отсутствующих в бд пользователей
-        $users = $this->convertUsers($issues);
-
-        //подготовленный массив отсутствующих в бд компонентов
-        $components = $this->convertComponents($componentsJiraObj);
+        $users = $this->convertUsers($issues, $insertForAllProjects);
+        //dd($users);
 
         try {
-            DB::transaction(function () use ($users, $components, $issues) {
+            DB::transaction(function () use ($users, $components, $issues, $insertForAllProjects) {
                 if (count($users) > 0) {
                     //dump($users);
                     Creator::insert($users);
                 }
+
                 if (count($components) > 0) {
-                    //dump($components);
                     Component::insert($components);
                 }
+
                 /** @var JiraIssue $item */
                 foreach ($issues as $item) {
                     //dd($item);
                     //создаем сущность Issue и записываем в бд
                     $issue = new Issue();
                     $issue->issue_id = (int)$item->id;
+                    $issue->project_id = (int)$item->fields->project->id;
                     $issue->key = ($item->key === null) ? null : $this->getCutKey($item->key);
                     $issue->summary = $item->fields->summary;
                     $issue->issue_type = $item->fields->issuetype->name;
@@ -109,15 +123,18 @@ class ParsingIssuesService
                     //dd($issue);
                     $issue->save();
 
-                    $componentsFromJira = $item->fields->components;
-                    if (count($componentsFromJira) > 0) {
-                        $arrToSync = [];
-                        /** @var JiraProjectComponent $comp */
-                        foreach ($componentsFromJira as $comp) {
-                            $arrToSync[] = (int)$comp->id;
+                    //если передан флаг что нужно записывать компоненты в бд
+                    if ($insertForAllProjects === false) {
+                        $componentsFromJira = $item->fields->components;
+                        if (count($componentsFromJira) > 0) {
+                            $arrToSync = [];
+                            /** @var JiraProjectComponent $comp */
+                            foreach ($componentsFromJira as $comp) {
+                                $arrToSync[] = (int)$comp->id;
+                            }
+                            //dd($arrToSync);
+                            $issue->rComponents()->sync($arrToSync);
                         }
-                        //dd($arrToSync);
-                        $issue->rComponents()->sync($arrToSync);
                     }
                 }
             }, 5);
@@ -144,30 +161,150 @@ class ParsingIssuesService
     }
 
     /**
+     * @param Collection $operators
+     * @param int $fetchedCount
+     * @return array
+     */
+    public function fetchIssuesFromAllProjects(int $fetchedCount, array $fields = [], array $expand = []): array
+    {
+        $issues = [];
+
+        //извлекаем проекты из бд кроме HelpDesc (исключаем HelpDesk проект)
+        $projectFromDb = Project::orderBy('project_id')
+            ->get()
+            ->filter(function ($project) {
+                /** @var Project $project */
+                return $project->project_id != '10400';
+            });
+
+        //извлекаем всех операторов в бд
+        //$operators = Operator::orderBy('user_key')->get();
+        $operators = Creator::whereIn('role_id', [2, 3])
+            ->orderByDesc('role_id')
+            ->orderBy('user_key')
+            ->get();
+
+        //запускаем цикл по операторам
+        /** @var Operator $operator */
+        foreach ($operators as $operator) {
+            //запускаем цикл по проектам
+            /** @var Project $project */
+            foreach ($projectFromDb as $project) {
+                //dump($project);
+                //ищет в бд issue с наибольшим key, которым относится в первому проекту в массиве
+                $lastIssue = Issue::whereProjectId($project->project_id)
+                    ->orderByDesc('key')
+                    ->first();
+                //dd($lastIssue);
+
+                //если в бд есть issue с наибольшим key, который относится в первому проекту в массиве - извлекаем
+                //по нему задачи
+                if ($lastIssue !== null) {
+                    $jql = sprintf(
+                        "project = '%s' AND creator = %s AND key > %s ORDER BY key ASC",
+                        $project->name,
+                        $operator->user_key,
+                        $lastIssue->rProject->key . '-' . $lastIssue->key
+                    );
+                    //dd($jql);
+
+                    $resultArray = $this->getIssuesByProject($jql, $fetchedCount, $fields, $expand);
+                    if (count($resultArray) > 0) {
+                        $issues = array_merge($issues, $resultArray);
+                    }
+
+                    //если в бд нет issue относящихся к проекту - извлекаем самые первые задачи в джире
+                } else {
+                    //dd("else");
+                    $jql = sprintf(
+                        "project = '%s' and creator = %s ORDER BY key ASC",
+                        $project->name,
+                        $operator->user_key
+                    );
+
+                    $resultArray = $this->getIssuesByProject($jql, $fetchedCount, $fields, $expand);
+                    if (count($resultArray) > 0) {
+                        $issues = array_merge($issues, $resultArray);
+                    }
+                }
+            }
+        }
+        //dd($issues);
+        return $issues;
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    public function handleProjectsInfo(): void
+    {
+        try {
+            $proj = new ProjectService();
+            $projectsFromJira = $proj->getAllProjects();
+        } catch (Exception $e) {
+            $errorMsg = sprintf(
+                '[%s]. Error fetch all projects from jira. %s.  Class - %s, line - %d',
+                Carbon::now()->toDateTimeString(),
+                $e->getMessage(),
+                __CLASS__,
+                __LINE__
+            );
+            dd($errorMsg);
+        }
+
+        if (count($projectsFromJira) === 0) {
+            $errorMsg = sprintf(
+                '[%s]. Count projects = 0. Class - %s, line - %d',
+                Carbon::now()->toDateTimeString(),
+                __CLASS__,
+                __LINE__
+            );
+            dd($errorMsg);
+        }
+
+        /** @var \JiraRestApi\Project\Project $project */
+        foreach ($projectsFromJira as $project) {
+            if (Project::whereProjectId($project->id)->count() == 0) {
+                try {
+                    DB::transaction(function () use ($project) {
+                        Project::create([
+                            'project_id' => (int)$project->id,
+                            'key'        => $project->key,
+                            'name'       => $project->name,
+                            'avatar_url' => $project->avatarUrls['48x48'],
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now()
+                        ]);
+                    }, 5);
+                } catch (Exception $e) {
+                    $errorMsg = sprintf(
+                        '[%s]. Error insert project to database. %s.  Class - %s, line - %d',
+                        Carbon::now()->toDateTimeString(),
+                        $e->getMessage(),
+                        __CLASS__,
+                        __LINE__
+                    );
+                    dd($errorMsg);
+                }
+            }
+        }
+    }
+
+    /**
      * @param string $jql
      * @param int $startAt
      * @param int $maxResult
+     * @param array $fields
+     * @param array $expand
      * @return IssueSearchResult
      */
-    private function search(string $jql, int $startAt, int $maxResult): IssueSearchResult
-    {
-        $fields = [
-            //'*all',
-            'summary',
-            'issuetype',
-            'creator',
-            'assignee',
-            'status',
-            'resolution',
-            'components',
-            'created',
-            'project'
-        ];
-
-        $expand = [
-            'changelog'
-        ];
-
+    private function search(
+        string $jql,
+        int $startAt,
+        int $maxResult,
+        array $fields = [],
+        array $expand = []
+    ): IssueSearchResult {
         try {
             $issueService = new IssueService();
             $result = $issueService->search($jql, $startAt, $maxResult, $fields, $expand);
@@ -185,10 +322,45 @@ class ParsingIssuesService
     }
 
     /**
+     * @param string $jql
+     * @param int $fetchedCount
+     * @param array $fields
+     * @param array $expand
+     * @return array
+     */
+    private function issuesToCommonArray(string $jql, int $fetchedCount, array $fields, array $expand): array
+    {
+        $issues = [];
+        $resultArray = $this->getIssuesByProject($jql, $fetchedCount, $fields, $expand);
+        if (count($resultArray) > 0) {
+            foreach ($resultArray as $item) {
+                $issues[] = $item;
+            }
+        }
+        return $issues;
+    }
+
+    /**
+     * @param string $jql
+     * @param int $fetchedCount
+     * @param array $fields
+     * @param array $expand
+     * @return array
+     */
+    private function getIssuesByProject(
+        string $jql,
+        int $fetchedCount,
+        array $fields,
+        array $expand
+    ): array {
+        return $this->fetchDataFromJira($jql, $fetchedCount, $fields, $expand)->issues;
+    }
+
+    /**
      * @param array $issues
      * @return array
      */
-    private function convertUsers(array $issues): array
+    private function convertUsers(array $issues, bool $insertForAllProjects): array
     {
         $users = [];
         $allUsers = [];
@@ -204,10 +376,11 @@ class ParsingIssuesService
                 $allUsers[] = $issue->fields->assignee;
             }
 
-            if ($issue->changelog->total > 0) {
-                $usersFromChangelog = $this->getUsersFromChangelog($issue->changelog);
-                //dump($usersFromChangelog);
-                $allUsers = array_merge($allUsers, $usersFromChangelog);
+            if ($issue->changelog !== null) {
+                if ($issue->changelog->total > 0) {
+                    $usersFromChangelog = $this->getUsersFromChangelog($issue->changelog);
+                    $allUsers = array_merge($allUsers, $usersFromChangelog);
+                }
             }
 
             //dd($allUsers);
@@ -215,16 +388,28 @@ class ParsingIssuesService
         //dd($allUsers);
         //удаляем дубликаты из массива объектов
         $withoutDuplicates = $this->removeDuplicateValues($allUsers);
+
+        //dd($withoutDuplicates);
         //перебор массива объектов - если в бд уже есть пользователя, исключаем его из массива
-        $checkInDb = array_filter($withoutDuplicates, function (Reporter $obj) {
-            return !$this->checkUserFromDb($obj->name);
-        });
+        //если передан флаг, что обрабатываются все проекты
+        if ($insertForAllProjects === true) {
+            $checkInDb = array_filter($withoutDuplicates, function (Reporter $obj) {
+
+                return $this->checkUserFromDbForAllProjects($obj->name);
+            });
+        } else { //иначе обрабатываем проект HelpDesk
+            $checkInDb = array_filter($withoutDuplicates, function (Reporter $obj) {
+                return !$this->checkUserFromDb($obj->name);
+            });
+        }
+
 
         //формируем массив пользователей
         /** @var Reporter $user */
         foreach ($checkInDb as $user) {
             $users[] = [
                 'user_key'     => $user->name,
+                'role_id' => ($insertForAllProjects) ? 4 : null,
                 'display_name' => $user->displayName,
                 'email'        => $user->emailAddress,
                 'avatar'       => $user->avatarUrls['48x48'],
@@ -232,8 +417,26 @@ class ParsingIssuesService
                 'updated_at'   => Carbon::now()
             ];
         }
-
+        //dd($users);
         return $users;
+    }
+
+    private function checkUserFromDbForAllProjects(string $userKey)
+    {
+
+        //если в бд есть пользователь с ролью 1 - обновляем ему role_id = 4 (операторов l1 и l2 не трогает)
+        //так же исключаем его из массива, т.е. не возвращаем его
+        if (Creator::whereUserKey($userKey)->whereRoleId(1)->count() > 0) {
+            Creator::whereUserKey($userKey)->update(['role_id' => 4]);
+            return false;
+        }
+
+        //если в бд уже есть user_key - не возвращаем его
+        if (Creator::whereUserKey($userKey)->count() > 0) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -354,7 +557,7 @@ class ParsingIssuesService
      */
     private function getCutKey(string $item): int
     {
-        return (int)explode('HELP-', $item)[1];
+        return (int)explode('-', $item)[1];
     }
 
     /**
@@ -399,5 +602,16 @@ class ParsingIssuesService
         }
 
         return $users;
+    }
+
+
+    /**
+     * @param JiraIssue $a
+     * @param JiraIssue $b
+     * @return int
+     */
+    public function cmp(\JiraRestApi\Issue\Issue $a, \JiraRestApi\Issue\Issue $b)
+    {
+        return strcmp($a->fields->creator->name, $b->fields->creator->name);
     }
 }
