@@ -100,9 +100,9 @@ Breadcrumbs::register('cabinet.jira.home', function (Crumbs $crumbs) {
     $crumbs->push('Jira', route('cabinet.jira.home'));
 });
 
-Breadcrumbs::register('cabinet.jira.creators', function (Crumbs $crumbs) {
+Breadcrumbs::register('cabinet.jira.users', function (Crumbs $crumbs) {
     $crumbs->parent('cabinet.jira.home');
-    $crumbs->push('Creators', route('cabinet.jira.creators'));
+    $crumbs->push('Creators', route('cabinet.jira.users'));
 });
 
 Breadcrumbs::register('cabinet.jira.operators', function (Crumbs $crumbs) {

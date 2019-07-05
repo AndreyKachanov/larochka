@@ -8,8 +8,8 @@
             <li class="nav-item     {{ (Route::currentRouteName() === 'cabinet.jira.issues') ? 'active' : '' }}">
                 <a class="nav-link waves-effect waves-light" href="{{ route('cabinet.jira.issues') }}" title="Issues">Issues</a>
             </li>
-            <li class="nav-item {{ (Route::currentRouteName() === 'cabinet.jira.creators') ? 'active' : '' }}">
-                <a class="nav-link waves-effect waves-light" href="{{ route('cabinet.jira.creators') }}" title="Creators">Creators</a>
+            <li class="nav-item {{ (Route::currentRouteName() === 'cabinet.jira.users') ? 'active' : '' }}">
+                <a class="nav-link waves-effect waves-light" href="{{ route('cabinet.jira.users') }}" title="Creators">Creators</a>
             </li>
             <li class="nav-item     {{ (Route::currentRouteName() === 'cabinet.jira.operators') ? 'active' : '' }}">
                 <a class="nav-link waves-effect waves-light" href="{{ route('cabinet.jira.operators') }}" title="Operators">Operators</a>

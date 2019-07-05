@@ -17,7 +17,6 @@ class JiraUserRolesSeeder extends Seeder
             Role::create(['name' => 'user']);
             Role::create(['name' => 'l1']);
             Role::create(['name' => 'l2']);
-            Role::create(['name' => 'development']);
         }
     }
 }

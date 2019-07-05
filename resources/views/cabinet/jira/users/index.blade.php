@@ -1,6 +1,6 @@
 @php
-    /** @var \App\Entity\Jira\User $creator */
-    /** @var \Illuminate\Pagination\LengthAwarePaginator $creators */
+    /** @var \App\Entity\Jira\User $user */
+    /** @var \Illuminate\Pagination\LengthAwarePaginator $users */
 @endphp
 
 @extends('layouts.app')
@@ -166,13 +166,13 @@
         </thead>
         <tbody>
 
-        @forelse($creators as $creator)
+        @forelse($users as $user)
             <tr class="d-flex">
-                <td class="col-3">{{ $creator->user_key }}</td>
-                <td class="col-3" style="word-wrap: break-word">{{ $creator->display_name }}</td>
-                <td class="col-3">{{ $creator->email }}</td>
+                <td class="col-3">{{ $user->user_key }}</td>
+                <td class="col-3" style="word-wrap: break-word">{{ $user->display_name }}</td>
+                <td class="col-3">{{ $user->email }}</td>
                 <td class="col-1">
-                    <img style="width: 30px" src="{{ $creator->avatar }}" alt="">
+                    <img style="width: 30px" src="{{ $user->avatar }}" alt="">
                 </td>
             </tr>
         @empty
@@ -182,6 +182,6 @@
         </tbody>
     </table>
 {{--    {{ $messages->appends(request()->except('page'))->links() }}--}}
-    {{ $creators->links() }}
+    {{ $users->links() }}
 
 @endsection

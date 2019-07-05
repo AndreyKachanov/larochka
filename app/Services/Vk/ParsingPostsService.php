@@ -236,32 +236,32 @@ class ParsingPostsService
                     $profiles = $response['response']['profiles'];
                     $groups = $response['response']['groups'];
                     foreach ($items as $item) {
-                        //ищем в массиве профайлов нужного юзера
-                        $profile = array_filter($profiles, function ($arr) use ($item) {
-                            return $arr['id'] === $item['from_id'];
-                        });
-                        $profile = array_shift($profile);
-                        $responseGroup = array_filter($groups, function ($arr) use ($item) {
-                            return $arr['id'] === -$item['owner_id'];
-                        });
-                        $responseGroup = array_shift($responseGroup);
-                        $temp['group_screen_name'] = $group['name'] ?? null;
-                        $temp['first_name'] = $profile['first_name'] ?? null;
-                        $temp['last_name'] = $profile['last_name'] ?? null;
-                        $temp['screen_name'] = $profile['screen_name'] ?? null;
-                        $temp['id'] = $item['id'] ?? null;
-                        $temp['group_id'] = $item['from_id'] ?? null;
-                        $temp['user_src'] = 'https://vk.com/id' . $profile['id'];
-                        $temp['date'] = $item['date'] ?? null;
-                        $temp['text'] = (iconv_strlen($item['text']) < 400
-                                ? $item['text']
-                                : '*** spam (400+ symbols) ***')
-                            ?? null;
-                        $temp['photo_50'] = $profile['photo_50'] ?? null;
-                        $temp['group_photo_50'] = $responseGroup['photo_50'] ?? null;
-                        $temp['group_src'] = 'https://vk.com/' . $responseGroup['screen_name'];
-                        $temp['group_name'] = $responseGroup['name'];
-                        $data[] = $temp;
+                        //если не спам
+                        if (iconv_strlen($item['text']) < 400) {
+                            //ищем в массиве профайлов нужного юзера
+                            $profile = array_filter($profiles, function ($arr) use ($item) {
+                                return $arr['id'] === $item['from_id'];
+                            });
+                            $profile = array_shift($profile);
+                            $responseGroup = array_filter($groups, function ($arr) use ($item) {
+                                return $arr['id'] === -$item['owner_id'];
+                            });
+                            $responseGroup = array_shift($responseGroup);
+                            $temp['group_screen_name'] = $group['name'] ?? null;
+                            $temp['first_name'] = $profile['first_name'] ?? null;
+                            $temp['last_name'] = $profile['last_name'] ?? null;
+                            $temp['screen_name'] = $profile['screen_name'] ?? null;
+                            $temp['id'] = $item['id'] ?? null;
+                            $temp['group_id'] = $item['from_id'] ?? null;
+                            $temp['user_src'] = 'https://vk.com/id' . $profile['id'];
+                            $temp['date'] = $item['date'] ?? null;
+                            $temp['text'] = $item['text'] ?? null;
+                            $temp['photo_50'] = $profile['photo_50'] ?? null;
+                            $temp['group_photo_50'] = $responseGroup['photo_50'] ?? null;
+                            $temp['group_src'] = 'https://vk.com/' . $responseGroup['screen_name'];
+                            $temp['group_name'] = $responseGroup['name'];
+                            $data[] = $temp;
+                        }
                     }
                 }
             }

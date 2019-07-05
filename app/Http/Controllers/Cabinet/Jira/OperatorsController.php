@@ -8,8 +8,7 @@
 
 namespace App\Http\Controllers\Cabinet\Jira;
 
-use App\Entity\Jira\Line;
-use App\Entity\Jira\Operator;
+use App\Entity\Jira\User;
 use App\Http\Controllers\Controller;
 
 class OperatorsController extends Controller
@@ -17,13 +16,12 @@ class OperatorsController extends Controller
 
     public function index()
     {
-        $operators = Operator::with('rLine', 'rCreator')
-            ->orderBy('line_id')
-            ->orderBy('user_key')
-            ->paginate(25);
+        $line1 = User::whereRoleId(2)->get();
+        $line2 = User::whereRoleId(3)->get();
 
         return view('cabinet.jira.operators.index', compact(
-            'operators'
+            'line1',
+            'line2'
         ));
     }
 }

@@ -157,7 +157,7 @@ Route::group(
             Route::get('/', 'Jira\IndexController@index')->name('home');
 
             Route::get('issues', 'Jira\IssuesController@index')->name('issues');
-            Route::get('creators', 'Jira\CreatorsController@index')->name('creators');
+            Route::get('users', 'Jira\UsersController@index')->name('users');
             Route::get('operators', 'Jira\OperatorsController@index')->name('operators');
         });
 

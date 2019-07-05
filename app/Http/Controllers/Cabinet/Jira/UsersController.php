@@ -12,7 +12,7 @@ use App\Entity\Jira\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class CreatorsController extends Controller
+class UsersController extends Controller
 {
     public function index()
     {
@@ -30,10 +30,10 @@ class CreatorsController extends Controller
         //    $query->where('email', $value);
         //}
 
-        $creators =  User::orderBy('user_key')->paginate(25);
+        $users =  User::orderBy('user_key')->paginate(25);
 
-        return view('cabinet.jira.creators.index', compact(
-            'creators'
+        return view('cabinet.jira.users.index', compact(
+            'users'
         ));
     }
 }

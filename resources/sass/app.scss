@@ -92,3 +92,32 @@ body {
   background-color: #495057;
   padding: .5rem 1rem;
 }
+
+//стриница операторов Jira
+.operators {
+  .h5 {
+    margin: 20px 0px 10px 0px;
+  }
+
+  .line1 {
+    counter-reset: counter1;
+  }
+
+  .line2 {
+    counter-reset: counter2;
+  }
+
+  .line1 th[scope='row']::before {
+    counter-increment: counter1;
+    content: counter(counter1);
+  }
+
+  .line2 th[scope='row']::before {
+    counter-increment: counter2;
+    content: counter(counter2);
+  }
+
+  .line1 tr td:nth-child(3), .line2 tr td:nth-child(3) {
+    width: 200px;
+  }
+}

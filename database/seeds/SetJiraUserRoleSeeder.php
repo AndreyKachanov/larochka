@@ -18,7 +18,6 @@ class SetJiraUserRoleSeeder extends Seeder
             'kondratska',
             'kostina',
             'maksiuta.y',
-            'maksyuta',
             'rizhuk',
             'stepina',
         ];
