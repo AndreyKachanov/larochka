@@ -39,6 +39,6 @@ class User extends Model
 
     public function rIssues()
     {
-        return $this->hasMany(Issue::class, 'user_key', 'creator');
+        return $this->hasMany(Issue::class, 'creator', 'user_key');
     }
 }

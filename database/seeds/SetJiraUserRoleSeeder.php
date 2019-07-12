@@ -41,7 +41,7 @@ class SetJiraUserRoleSeeder extends Seeder
                 if (User::whereIn('user_key', $line2)->count() > 0) {
                     User::whereIn('user_key', $line2)->update(['role_id' => 3]);
                 }
-                //проставляем проли для обычных юзеров
+                //проставляем роли для обычных юзеров
                 User::whereNull('role_id')->update(['role_id' => 1]);
             }, 5);
         } catch (Exception $e) {

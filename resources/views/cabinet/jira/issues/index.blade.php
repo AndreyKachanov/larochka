@@ -196,4 +196,5 @@
     {{--</table>--}}
     {{--{{ $messages->appends(request()->except('page'))->links() }}--}}
 
+    <chartline-component></chartline-component>
 @endsection

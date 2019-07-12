@@ -54,6 +54,8 @@ if (token) {
 
 import Echo from 'laravel-echo'
 
+import BootstrapVue from 'bootstrap-vue'
+
 window.Pusher = require('pusher-js');
 
 window.Echo = new Echo({

@@ -21,26 +21,6 @@ class IssuesController extends Controller
 
     public function index()
     {
-        //dd(Issue::find('11149')->rCreator->rOperator->rLine->name);
-        //$issues = Issue::with('rAssignee')->get();
-        //$issues = Issue::with('rAssignee.rOperator.rLine')->get();
-
-        Issue::whereHas('rAssignee', function ($creator) {
-            /** @var User $creator */
-            $creator->whereUserKey('a.kachanov');
-            $creator->whereHas('rOperator', function ($operator) {
-                /** @var Operator $operator */
-                $operator->whereHas('rLine', function ($line) {
-                    /** @var Line $line */
-                    //$line->whereName('L1');
-                });
-            });
-        })->whereHas('rComponents', function ($component) {
-            /** @var Component $component */
-            $component->whereName('Квитанции');
-        })->get()->dump();
-
-
         return view('cabinet.jira.issues.index');
     }
 }

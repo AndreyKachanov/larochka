@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\PublicChat;
+use App\Entity\Jira\User;
+use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
-    public function test()
+    public function test(Request $request)
     {
-        //PublicChat::dispatch("get my message");
-        return view('test');
+
+        $query = $request->get('query');
+        $users = User::where('user_key','like','%'.$query.'%')->get();
+        //dd($users);
+        return response()->json($users);
     }
 }

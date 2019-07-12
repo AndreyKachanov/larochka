@@ -9,6 +9,13 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 Vue.config.productionTip = false;
+
+import BootstrapVue from 'bootstrap-vue'
+Vue.use(BootstrapVue)
+
+import Vue from 'vue'
+
+
 //
 // /**
 //  * The following block of code may be used to automatically register your
@@ -28,6 +35,8 @@ Vue.component('test-chat', require('./components/TestChat.vue').default);
 Vue.component('currencies', require('./components/Currencies.vue').default);
 Vue.component('parser', require('./components/Parser.vue').default);
 Vue.component('currencies-table', require('./components/CurrenciesTable.vue').default);
+Vue.component('autocomplete', require('./components/Autocomplete.vue').default);
+Vue.component('chartline-component', require('./components/ChartlineComponent.vue').default);
 //
 // /**
 //  * Next, we will create a fresh Vue application instance and attach it to
@@ -38,3 +47,5 @@ Vue.component('currencies-table', require('./components/CurrenciesTable.vue').de
 const app = new Vue({
     el: '#app'
 });
+
+

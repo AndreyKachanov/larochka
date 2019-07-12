@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use JiraRestApi\Project\ProjectService;
 use JiraRestApi\JiraException;
 use JiraRestApi\Issue\IssueService;
+use App\Entity\Jira\User;
+
+Route::get('/start/data-chart', 'StartController@chartData')->name('chartJs');
 
 
 Route::get('/test123', function () {
@@ -51,23 +54,13 @@ Route::get('/test123', function () {
 })->name('test');
 
 Route::get('/test111', function () {
-    $username = config('jira.user');
-    $password = config('jira.password');
-
-    //$url = 'https://xxx.atlassian.net/rest/api/2/Issue/Bug-5555';
-    $url = 'https://sd.court.gov.ua/rest/api/2/issue/HELP-9903?expand=changelog';
-
-    $curl = curl_init();
-    curl_setopt($curl, CURLOPT_USERPWD, "$username:$password");
-    curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-
-    $issue_list = (curl_exec($curl));
-    dd(json_decode($issue_list));
-
+    $test = User::whereRoleId(2)->orWhere('role_id', 3)->orderBy('role_id')->with('rIssues')->get();
+    //$test = User::whereRoleId(2)->orWhere('role_id', 3)->orderBy('role_id')->pluck('user_key')->toArray();
+    $data = [];
+    foreach ($test as $item) {
+        $data[] = $item->rIssues->count();
+    }
+    dd($data);
 })->name('test111');
 
 Route::get('/test222', function () {
@@ -115,7 +108,6 @@ Route::get('/test678', function () {
         print("Error Occured! " . $e->getMessage());
     }
 })->name('test678');
-
 
 Route::get('/test', 'TestController@test')->name('test');
 //Route::get('/test3', 'TestController@test3')->name('test3');
