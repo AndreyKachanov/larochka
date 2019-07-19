@@ -46,5 +46,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('vk-parser', function (User $user) {
             return $user->isAdmin();
         });
+
+        Gate::define('jira', function (User $user) {
+            return $user->isAdmin();
+        });
     }
 }

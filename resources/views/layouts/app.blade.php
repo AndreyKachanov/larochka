@@ -83,7 +83,7 @@
         <footer>
             <div class="container">
                 <div class="border-top pt-3">
-                    <p>&copy; {{ date('Y') }} - {{ config('app.author') }}</p>
+                    <p style="text-align: center;">&copy; {{ date('Y') }} - {{ config('app.author') }}</p>
                 </div>
             </div>
         </footer>

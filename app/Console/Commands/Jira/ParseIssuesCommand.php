@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands\Jira;
 
+use App\Entity\Jira\User;
+use App\Events\ChartjsEvent;
+use App\Services\Jira\ChartJsService;
 use App\Services\Jira\ParsingIssuesService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -29,16 +32,21 @@ class ParseIssuesCommand extends Command
      * @var ParsingIssuesService
      */
     private $service;
+    /**
+     * @var ChartJsService
+     */
+    private $chartJsService;
 
     /**
      * ParseIssuesCommand constructor.
      * @param ParsingIssuesService $service
      */
-    public function __construct(ParsingIssuesService $service)
+    public function __construct(ParsingIssuesService $service, ChartJsService $chartJsService)
     {
         parent::__construct();
 
         $this->service = $service;
+        $this->chartJsService = $chartJsService;
     }
 
     /**
@@ -104,7 +112,6 @@ class ParseIssuesCommand extends Command
         $fields = [
             //'*all',
             'summary',
-            'issuetype',
             'creator',
             'assignee',
             'status',
@@ -132,6 +139,11 @@ class ParseIssuesCommand extends Command
                 );
             }
         }
+
+        //send data to pusher
+        //$dataForChartJs = $this->chartJsService->getDataToChartJs();
+        //broadcast(new ChartjsEvent($dataForChartJs));
+
         $this->info($resultMsg);
         return true;
     }

@@ -20,6 +20,11 @@ class SetJiraUserRoleSeeder extends Seeder
             'maksiuta.y',
             'rizhuk',
             'stepina',
+            'vakulenko',
+            'zhylun',
+            'yepiskoposyan',
+            'l.tkach',
+            'maksymenko'
         ];
 
         $line2 = [

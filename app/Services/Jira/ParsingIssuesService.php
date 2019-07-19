@@ -108,7 +108,7 @@ class ParsingIssuesService
                     $issue->project_id = (int)$item->fields->project->id;
                     $issue->key = ($item->key === null) ? null : $this->getCutKey($item->key);
                     $issue->summary = $item->fields->summary;
-                    $issue->issue_type = $item->fields->issuetype->name;
+                    $issue->issue_type_id = $this->getIssueType($item);
                     $issue->status = $item->fields->status->name;
                     $issue->resolution = $item->fields->resolution->name ?? null;
                     $issue->creator = $item->fields->creator->name;
@@ -432,6 +432,41 @@ class ParsingIssuesService
     private function getCutKey(string $item): int
     {
         return (int)explode('-', $item)[1];
+    }
+
+    /**
+     * @param JiraIssue $item
+     * @return int
+     */
+    private function getIssueType(JiraIssue $item): int
+    {
+        // issue принадлежит не HelpDesk (Інши проекті)
+        $issueType = 6;
+
+        if ($item->fields->project->key === 'HELP') {
+            if ($item->fields->creator->name === 'Oragenerate') {
+                $summary = $item->fields->summary;
+                if (strpos($summary, 'Відмовлено в реєстрації') !== false) {
+                    $issueType = 1;
+                }
+
+                if (strpos($summary, 'Зареєстровано та не розподілено') !== false) {
+                    $issueType = 2;
+                }
+
+                if (strpos($summary, 'Помилка обробки') !== false) {
+                    $issueType = 3;
+                }
+
+                if (strpos($summary, 'Прийнято та очікує на реєстрацію') !== false) {
+                    $issueType = 4;
+                }
+            } else {
+                $issueType = 5;
+            }
+        }
+
+        return $issueType;
     }
 
     /**

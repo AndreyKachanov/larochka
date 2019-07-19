@@ -12,3 +12,7 @@ Broadcast::channel('room.{room_id}', function ($user, $room_id) {
     //return $user->id === 3 || $user->id === 4;
     //return true;
 });
+
+Broadcast::channel('test', function () {
+    return true;
+});

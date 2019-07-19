@@ -2,6 +2,7 @@
 
 namespace App\Entity\Jira;
 
+use App\Entity\Jira\Issue\Type;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -44,6 +45,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $project_id
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereProjectId($value)
  * @property-read \App\Entity\Jira\Project $rProject
+ * @property int $issue_type_id
+ * @property-read \App\Entity\Jira\Issue\Type $rType
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Entity\Jira\Issue whereIssueTypeId($value)
  */
 class Issue extends Model
 {
@@ -77,5 +81,10 @@ class Issue extends Model
     public function rProject()
     {
         return $this->belongsTo(Project::class, 'project_id', 'project_id');
+    }
+
+    public function rType()
+    {
+        return $this->belongsTo(Type::class, 'issue_type_id', 'id');
     }
 }

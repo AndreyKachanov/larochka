@@ -8,19 +8,31 @@
 
 namespace App\Http\Controllers\Cabinet\Jira;
 
-use App\Entity\Jira\Component;
 use App\Entity\Jira\User;
-use App\Entity\Jira\Issue;
-use App\Entity\Jira\Line;
-use App\Entity\Jira\Operator;
 use App\Http\Controllers\Controller;
-use Illuminate\Database\Query\Builder;
+use App\Services\Jira\ChartJsService;
 
 class IssuesController extends Controller
 {
 
+    private $service;
+
+    public function __construct(ChartJsService $service)
+    {
+        $this->middleware('can:jira');
+        $this->service = $service;
+    }
+
+
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function index()
     {
-        return view('cabinet.jira.issues.index');
+        $dataForChartJs = $this->service->getDataToChartJs();
+
+        return view('cabinet.jira.issues.index', [
+            'data' => $dataForChartJs
+        ]);
     }
 }
