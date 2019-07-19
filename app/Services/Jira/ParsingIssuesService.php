@@ -462,6 +462,7 @@ class ParsingIssuesService
                     $issueType = 4;
                 }
             } else {
+                // Решта (не статиститка)
                 $issueType = 5;
             }
         }

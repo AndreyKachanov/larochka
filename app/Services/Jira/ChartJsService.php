@@ -50,8 +50,8 @@ class ChartJsService
         $startData = Carbon::now()->subMonth()->startOfMonth()->addDays(24);
         $endDate = Carbon::now()->startOfMonth()->addDays(24);
 
-        //dump($startData);
-        //dd($endDate);
+        dump($startData);
+        dd($endDate);
 
         foreach ($issueTypes as $type) {
             if ($type['name'] != 'Інші проекти') {
