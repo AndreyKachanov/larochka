@@ -10,7 +10,7 @@
                             title: {
                                 display: true,
                                 fontSize: 14,
-                                text: 'Статистика по проекту HelpDesk (по полю \'Виконевець\', 25.06 - 25.07)'
+                                text: 'Статистика по проекту HelpDesk (по полю \'Виконевець\', 25.07 - 25.08)'
                             },
                             responsive: true,
                             maintainAspectRation: true,

@@ -86,6 +86,7 @@ class ParseIssuesCommand extends Command
             }
         //если в бд есть записи - дополняем новыми задачами из джиры
         } else {
+            //dd("1");
             $countIssuesFromDb = Issue::count();
             $jql = 'order by created ASC';
             $result = $this->handleIssues($jql, $fetchedCount, $countIssuesFromDb);
