@@ -47,8 +47,10 @@ class ChartJsService
 
         $arrayToChartJs = [];
 
-        $startData = Carbon::now()->subMonth()->startOfMonth()->addDays(24);
-        $endDate = Carbon::now()->startOfMonth()->addDays(25);
+        //$startData = Carbon::now()->subMonth()->startOfMonth()->addDays(24);
+        $startData = Carbon::createFromDate(2019, 06, 25);
+        //$endDate = Carbon::now()->startOfMonth()->addDays(25);
+        $endDate = Carbon::createFromDate(2019, 07, 25);
 
         //dump($startData);
         //dd($endDate);
