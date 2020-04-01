@@ -10,7 +10,7 @@
                             title: {
                                 display: true,
                                 fontSize: 14,
-                                text: 'Статистика по проекту HelpDesk (по полю \'Виконевець\', 01.01.2020 - 16.01.2020)'
+                                text: 'Статистика по проекту HelpDesk (по полю \'Виконевець\', 01.03.2020 - 31.03.2020)'
                             },
                             responsive: true,
                             maintainAspectRation: true,
