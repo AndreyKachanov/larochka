@@ -28,15 +28,16 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command(ParseMailBoxCommand::class)
             ->withoutOverlapping(9)
-            ->everyFiveMinutes()
+            ->everyMinute()
             ->appendOutputTo(storage_path('logs/schedule-parse_mail_command.log'))
             ->emailOutputOnFailure('andrey170749@yandex.ru');
 
         $schedule->command(ParseIssuesCommand::class)
-           ->everyFiveMinutes()
-           ->withoutOverlapping(4)
-           ->appendOutputTo(storage_path('logs/schedule-parse_issues_command.log'))
-           ->emailOutputOnFailure('andrey170749@yandex.ru');
+            ->withoutOverlapping(4)
+            ->weekdays()
+            ->twiceDaily(1, 12)
+            ->appendOutputTo(storage_path('logs/schedule-parse_issues_command.log'))
+            ->emailOutputOnFailure('andrey170749@yandex.ru');
     }
 
     /**
