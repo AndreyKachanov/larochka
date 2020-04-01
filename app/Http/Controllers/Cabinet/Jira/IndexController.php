@@ -27,6 +27,7 @@ class IndexController extends Controller
     public function index()
     {
         $dataForChartJs = $this->service->getDataToChartJs();
+        //dd($dataForChartJs);
 
         return view('cabinet.jira.index', [
             'data' => $dataForChartJs

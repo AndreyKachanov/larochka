@@ -97,6 +97,7 @@ class ParseMailBoxCommand extends Command
         // получаем айдишники сообщений из почты. Если выборка пустая, вернется пустой массив
         $messagesIds = $this->service->getMessagesIds($offset, $maxEntriesReturned, $folder);
 
+
         if (empty($messagesIds)) {
             $errorMsg = sprintf(
                 'Parsing of folder >>%s<<. Missing data, offset %d, max entries %d.',

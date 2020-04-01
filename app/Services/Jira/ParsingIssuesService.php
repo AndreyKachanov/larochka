@@ -95,6 +95,7 @@ class ParsingIssuesService
                     User::insert($users);
                 }
 
+                //dd($components);
                 if (count($components) > 0) {
                     Component::insert($components);
                 }

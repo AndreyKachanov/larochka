@@ -168,11 +168,11 @@ class ParseMailBox
         try {
             $messages_response = $this->client->GetItem($parts_request)->ResponseMessages->GetItemResponseMessage;
         } catch (Exception $e) {
-            dd($e->getMessage());
+            dump($e->getMessage());
         }
 
         foreach ($messages_response as $message) {
-//            dump($message);
+            //dd($message);
 
             if ($message->MessageText === null) {
                 $dateReceived = Carbon::createFromFormat(
@@ -338,6 +338,10 @@ class ParseMailBox
 
     private function getIpAddressInfo($ipAddressFromMessage): array
     {
+        if (strpos($ipAddressFromMessage, '10.') === 0) {
+            return [];
+        };
+
         $client = new GuzzleClient();
         $request = "http://ip-api.com/json/$ipAddressFromMessage?fields=status,country,countryCode,region,regionName,city,isp,org,mobile,query&lang=ru";
 

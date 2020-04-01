@@ -24,7 +24,8 @@ class SetJiraUserRoleSeeder extends Seeder
             'zhylun',
             'yepiskoposyan',
             'l.tkach',
-            'maksymenko'
+            'maksymenko',
+            'kolisnyk'
         ];
 
         $line2 = [

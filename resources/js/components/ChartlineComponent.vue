@@ -10,7 +10,7 @@
                             title: {
                                 display: true,
                                 fontSize: 14,
-                                text: 'Статистика по проекту HelpDesk (по полю \'Виконевець\', 25.06 - 25.07)'
+                                text: 'Статистика по проекту HelpDesk (по полю \'Виконевець\', 01.01.2020 - 16.01.2020)'
                             },
                             responsive: true,
                             maintainAspectRation: true,
@@ -132,7 +132,8 @@
                     app.itemsForTable.push(obj);
                 });
 
-                // console.log(this.itemsForTable);
+                console.log(this.itemsForTable);
+                console.log(this.fieldsForTable);
                 // this.itemsForTable = [
                 //     { Призвище: Фомина, Тип1: 100, Тип2: 200, Тип3: 300 e: 'выа', f: 'asdf' },
                 //     { aa: 1, bb: 'Three', c: 'Dog', d: 'ыва', e: 'выа', f: 'asdf' },
