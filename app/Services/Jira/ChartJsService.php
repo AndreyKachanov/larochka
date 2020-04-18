@@ -50,8 +50,8 @@ class ChartJsService
         //$startData = Carbon::now()->subMonth()->startOfMonth()->addDays(24);
         //$endDate = Carbon::now()->startOfMonth()->addDays(25);
 
-        $startData = Carbon::createFromDate(2020, 03, 1);
-        $endDate = Carbon::createFromDate(2020, 03, 31);
+        $startData = Carbon::createFromDate(2020, 04, 1);
+        $endDate = Carbon::createFromDate(2020, 04, 30);
 
 
         //$startData = Carbon::createFromDate(2019, 06, 1);
