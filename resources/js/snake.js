@@ -91,7 +91,8 @@ window.onload = function () {
 
         if (!snake.alive) {
             clearInterval(timer);
-            alert('gameover');
+            // alert('gameover');
+            location.reload();
         }
         if (snake.eaten) {
             score++;
