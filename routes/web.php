@@ -7,7 +7,7 @@ use JiraRestApi\Issue\IssueService;
 use App\Entity\Jira\User;
 
 Route::get('/start/data-chart', 'StartController@chartData')->name('chartJs');
-
+Route::get('/snake', 'SnakeController@index')->name('snake');
 
 Route::get('/test123', function () {
 

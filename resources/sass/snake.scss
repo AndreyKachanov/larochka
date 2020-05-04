@@ -1,0 +1,94 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+@import '~bootstrap-vue/src/index.scss';
+
+
+
+
+@import "~font-awesome/scss/font-awesome.scss";
+@import "~summernote/dist/summernote-bs4.css";
+
+//html, body {
+//    margin: 0;
+//    background: #d4d4d4;
+//}
+//html {
+//    min-width: 100vw;
+//    min-height: 100vh;
+//    display: flex;
+//    justify-content: center;
+//    align-items: center;
+//}
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+.app-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.navbar {
+    background-color: #0c64a2;
+    padding: 0.35rem 1rem;
+}
+
+.nav-pills a {
+    font-size: 13px;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    background-color: #42b983;
+}
+
+.nav-link {
+    padding: 0.2rem 0.73rem;
+
+}
+
+.nav-pills .nav-link.red {
+    background-color: #f0ad4e;
+    color: #4c1010;
+}
+
+#fields {
+    /*width: 400px;*/
+    margin: 20px;
+    overflow: hidden;
+    display: inline-block;
+}
+
+#fields > div {
+    width: 20px;
+    height: 20px;
+    box-sizing: border-box;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    float: left;
+}
+
+#fields > div[data-game='fruit'] {
+    background: #f00;
+}
+
+#fields > div[data-game='snake'] {
+    background-color: #ff0;
+}
+#fields > div[data-game='wall'] {
+    background-color: #111103;
+}
+
+#fields > div.row-start {
+    clear:both;
+}
+
+
