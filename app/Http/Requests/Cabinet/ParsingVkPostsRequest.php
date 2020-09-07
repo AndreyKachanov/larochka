@@ -71,7 +71,7 @@ class ParsingVkPostsRequest extends FormRequest
                 'max:100',
                 function ($attribute, $value, $fail) use ($countGroups) {
                     if (!$this->service->checkGroup($value, $countGroups)) {
-                        $fail('Vk group ' . $value . ' does not exist.');
+                        $fail('Vk group ' .  '<b>' . $value . '</b> ' .  'does not exist');
                     }
                 },
             ],
@@ -85,7 +85,8 @@ class ParsingVkPostsRequest extends FormRequest
         $attributesForGroups = $groupsRequest ? $this->setAttributesForGroups($groupsRequest, $groupsKeyName) : [];
 
         $attributes = [
-            'groups' => 'Vk group name'
+            'groups' => 'vk groups',
+            'days' => 'count days'
         ];
 
         $attributes = array_merge($attributesForGroups, $attributes);
@@ -95,15 +96,15 @@ class ParsingVkPostsRequest extends FormRequest
     public function messages()
     {
         return [
-            'groups.required' => 'The :attribute field is required.',
-            'groups.min' => 'The :attribute must be at least :min.',
+            'required' => 'The <b>:attribute</b> field is required',
+            'groups.min' => 'The :attribute must be at least :min',
         ];
     }
 
     private function setAttributesForGroups(array $groupsRequest, string $groupsKeyName): array
     {
         foreach ($groupsRequest as $key => $value) {
-            $arr[$groupsKeyName . '.' . $key . '.name'] = 'Vk group name';
+            $arr[$groupsKeyName . '.' . $key . '.name'] = '<b>vk group</b>';
         }
         return $arr;
     }

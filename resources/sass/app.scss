@@ -11,6 +11,9 @@
 @import '~bootstrap/scss/bootstrap';
 @import '~bootstrap-vue/src/index.scss';
 
+//@import '~bootstrap/scss/functions';
+//@import '~bootstrap/scss/variables';
+//@import '~bootstrap/scss/mixins';
 
 
 
@@ -26,6 +29,7 @@
 body {
   display: flex;
   min-height: 100vh;
+  min-width: 270px;
   flex-direction: column;
 }
 

@@ -5,6 +5,7 @@ namespace App\Services\Vk;
 use App\Events\PrivateTest;
 use App\Events\SendPostToPusherWithoutQueue;
 use App\Events\SendPostToPusherWithQueue;
+use App\Exceptions\VkResponseException;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
@@ -37,9 +38,9 @@ class ParsingPostsService
         $userId = Auth::id();
         $url = 'https://api.vk.com/method/resolveScreenName';
         $query = [
-            'screen_name' => $group,
+            'screen_name'  => $group,
             'access_token' => $this->accessToken,
-            'v' => '5.92'
+            'v'            => '5.92'
         ];
         $delay = $countGroups > 3 ? 333.3 : 0;
         $response = $this->getResponseByGuzzleClient2($url, $query, $delay);
@@ -49,12 +50,12 @@ class ParsingPostsService
                     $arr = Cache::get('parsing_vk_groups_live');
                     $arr[$userId][] = [
                         'name' => $group,
-                        'id' => $response['response']['object_id']
+                        'id'   => $response['response']['object_id']
                     ];
                 } else {
                     $arr[$userId][] = [
                         'name' => $group,
-                        'id' => $response['response']['object_id']
+                        'id'   => $response['response']['object_id']
                     ];
                 }
                 Cache::forever('parsing_vk_groups_live', $arr);
@@ -128,14 +129,14 @@ class ParsingPostsService
             $arr[$userId] = [
                 'groups'   => $groupsFromVk,
                 'keywords' => $keywords,
-                'days' => $days
+                'days'     => $days
             ];
         } else {
             $arr = [
                 $userId => [
                     'groups'   => $groupsFromVk,
                     'keywords' => $keywords,
-                    'days' => $days
+                    'days'     => $days
                 ]
             ];
         }
@@ -151,14 +152,14 @@ class ParsingPostsService
             $arr[$userId] = [
                 'groups'   => $groupsFromVk,
                 'keywords' => $keywords,
-                'days' => $days
+                'days'     => $days
             ];
         } else {
             $arr = [
                 $userId => [
                     'groups'   => $groupsFromVk,
                     'keywords' => $keywords,
-                    'days' => $days
+                    'days'     => $days
                 ]
             ];
         }
@@ -214,19 +215,19 @@ class ParsingPostsService
     public function getPosts(array $parsingData): Collection
     {
         $url = 'https://api.vk.com/method/wall.search';
-        $delay =  333.3;
+        $delay = 333.3;
 
         $data = [];
         foreach ($parsingData['groups'] as $group) {
             foreach ($parsingData['keywords'] as $keyword) {
                 $query = [
-                    'owner_id' => '-' .  $group['id'],
-                    'query' => $keyword,
+                    'owner_id'     => '-' . $group['id'],
+                    'query'        => $keyword,
                     //'query' => implode(',', $parsingData['keywords']),
                     'access_token' => $this->accessToken,
-                    'v' => '5.58',
-                    'extended' => 1,
-                    'count' => 100
+                    'v'            => '5.58',
+                    'extended'     => 1,
+                    'count'        => 100
                 ];
                 $response = $this->getResponseByGuzzleClient2($url, $query, $delay);
                 //dump($response);
@@ -270,39 +271,6 @@ class ParsingPostsService
     }
 
     /**
-     * @param string $request
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    //private function getResponseByGuzzleClient(string $request): array
-    //{
-    //    usleep(300000);
-    //    try {
-    //        $response = $this->client->get($request)->getBody()->getContents();
-    //        $json = json_decode($response, true);
-    //        //если запрос прошел удачно, но вк вернул ошибку - останавливаем и выводим
-    //        if (isset($json['error'])) {
-    //            $error = $json['error'];
-    //            $errorMsg = sprintf(
-    //                'Response vk has error. Error code - %d, error msg - %s',
-    //                $error['error_code'],
-    //                $error['error_msg']
-    //            );
-    //            dd($errorMsg);
-    //        }
-    //    } catch (RequestException $e) {
-    //        $errorMsg = sprintf(
-    //            'Error during Guzzle request. %s. Line - %d. File - %s. (ParsingPostsService.php, 60+ line)',
-    //            $e->getMessage(),
-    //            $e->getLine(),
-    //            $e->getFile()
-    //        );
-    //        dd($errorMsg);
-    //    }
-    //    return $json;
-    //}
-
-    /**
      * @param string $url
      * @param array $query
      * @param $delay
@@ -311,7 +279,6 @@ class ParsingPostsService
      */
     private function getResponseByGuzzleClient2(string $url, array $query, $delay): array
     {
-        $json = [];
         try {
             $response = $this->client->request('GET', $url, [
                 'delay' => $delay,
@@ -319,27 +286,33 @@ class ParsingPostsService
             ])->getBody()->getContents();
 
             $json = json_decode($response, true);
-
+            //$json['error'] = [
+            //    'error_code' => 777,
+            //    'error_msg'  => 'Превышен лимит!'
+            //];
             if (isset($json['error'])) {
                 $error = $json['error'];
                 $errorMsg = sprintf(
-                    'Response vk has error. Error code - %d, error msg - %s. Class - %s, line - %d, query - %s',
+                    "Response vk has error: " . PHP_EOL .
+                    "\t\t Error code - %d, error msg - %s." . PHP_EOL .
+                    "\t\t Class - %s, line - %d.",
                     $error['error_code'],
                     $error['error_msg'],
                     __CLASS__,
-                    __LINE__,
-                    $url
+                    __LINE__
                 );
-                dd($errorMsg);
+                throw new VkResponseException($errorMsg);
             }
         } catch (Exception $e) {
             $errorMsg = sprintf(
-                'Error during Guzzle request. %s.  Class - %s, line - %d',
-                $e->getMessage(),
+                "Error during Guzzle request:" . PHP_EOL .
+                "\tClass - %s, line - %d." . PHP_EOL .
+                "\t%s",
                 __CLASS__,
-                __LINE__
+                __LINE__,
+                $e->getMessage()
             );
-            dd($errorMsg);
+            throw new VkResponseException($errorMsg);
         }
         return $json;
     }

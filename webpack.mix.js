@@ -11,6 +11,7 @@ if (env === 'production' || env === 'dev') {
         .sass('resources/sass/app.scss', 'public/css')
         .sass('resources/sass/snake.scss', 'public/css')
         .version();
+// env === local
 } else {
     mix
         .setPublicPath('public/build')
@@ -19,11 +20,17 @@ if (env === 'production' || env === 'dev') {
         .js('resources/js/snake.js', 'js')
         .sass('resources/sass/app.scss', 'css')
         .sass('resources/sass/snake.scss', 'css')
+        .options({
+            extractVueStyles: false,
+            globalVueStyles: 'resources/sass/vue_components.scss'
+        })
         .version();
 }
 
-mix.webpackConfig({
-    plugins: [
-        new webpack.IgnorePlugin(/^codemirror$/)
-    ]
-});
+mix.webpackConfig(
+    {
+        plugins: [
+            new webpack.IgnorePlugin(/^codemirror$/)
+        ]
+    }
+);

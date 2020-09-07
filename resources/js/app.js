@@ -49,5 +49,5 @@ const app = new Vue({
 });
 
 window.onload = function() {
-    console.log(123);
+    //console.log(123);
 };
