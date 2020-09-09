@@ -66,61 +66,6 @@ class ParsingPostsService
         return false;
     }
 
-    /**
-     * @param array $vkGroups
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    //public function getGroups(array $vkGroups): array
-    //{
-    //    $arr = [];
-    //    foreach ($vkGroups as $group) {
-    //        try {
-    //            $response = $this->client->request('GET', 'https://api.vk.com/method/resolveScreenName', [
-    //                'delay' => (count($vkGroups) > 3) ? '334' : '0',
-    //                'query' => [
-    //                    'screen_name' => $group['name'],
-    //                    'access_token' => $this->accessToken,
-    //                    'v' => '5.92'
-    //                ]
-    //            ])->getBody()->getContents();
-    //
-    //            $json = json_decode($response, true);
-    //            //если запрос прошел удачно, но вк вернул ошибку - останавливаем и выводим
-    //            if (isset($json['error'])) {
-    //                $error = $json['error'];
-    //                $errorMsg = sprintf(
-    //                    'Response vk has error. Error code - %d, error msg - %s',
-    //                    $error['error_code'],
-    //                    $error['error_msg']
-    //                );
-    //                dd($errorMsg);
-    //            }
-    //
-    //            //если вернулся какой-то ответ
-    //            if (!empty($json['response'])) {
-    //                //если в ответе есть группы
-    //                if ($json['response']['type'] === 'group') {
-    //                    $arr[] = [
-    //                        'name' => $group['name'],
-    //                        'id'   => $json['response']['object_id']
-    //                    ];
-    //                }
-    //            }
-    //        } catch (Exception $e) {
-    //            $errorMsg = sprintf(
-    //                'Error during Guzzle request. %s. Line - %d. File - %s. (ParsingPostsService.php, 60+ line)',
-    //                $e->getMessage(),
-    //                $e->getLine(),
-    //                $e->getFile()
-    //            );
-    //            dd($errorMsg);
-    //        }
-    //    }
-    //
-    //    return $arr;
-    //}
-
     public function setParsingDataFromUser(int $userId, array $groupsFromVk, string $keywords, int $days): void
     {
         $keywords = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', $keywords);
@@ -189,7 +134,7 @@ class ParsingPostsService
         $dataForPusher = $posts->where('date', '>=', $moreThat)
             ->sortByDesc('date')
             ->map(function ($item, $key) {
-                $item['date'] = Carbon::createFromTimestamp($item['date'])->format('d.m.Y H:i:s');
+                $item['date'] = Carbon::createFromTimestamp($item['date'])->format('d.m.y H:i:s');
                 return $item;
             });
 

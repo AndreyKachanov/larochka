@@ -41,35 +41,80 @@
                 <button @click="start" class="btn btn-success">Start parse</button>
                 <img class="money-img" src="/assets/images/money-bag.svg" title="" alt="">
             </div>
-<!--            <div class="img-block">-->
-<!--                <img class="money-img" src="/assets/images/money-bag.svg" title="" alt="">-->
-<!--            </div>-->
         </div>
         <div class="table-responsive">
-            <table v-if="posts.length" class="table table-striped table-messages">
+<!--            <table v-if="posts.length" class="table table-striped table-messages">-->
+<!--                <thead>-->
+<!--                <tr class="d-flex">-->
+<!--                    <th class="col-2">Date</th>-->
+<!--                    <th class="col-3">Author</th>-->
+<!--                    <th class="col-4">Post</th>-->
+<!--                    <th class="col-3">Vk group</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                <tr v-for="(item) in posts" class="d-flex">-->
+<!--                    <td class="col-1">{{ item.date }}</td>-->
+<!--                    <td class="col-3">-->
+<!--                        <a :href="item.user_src" target="_blank" class="user-link">-->
+<!--                            <img width="30px;" :src="item.photo_50" alt="">&nbsp;&nbsp;{{ item.first_name }}&nbsp;&nbsp;{{ item.last_name }}-->
+<!--                        </a>-->
+<!--                    </td>-->
+<!--                    <td class="col-4">{{ item.text }}</td>-->
+<!--                    <td class="col-3">-->
+<!--                        <a :href="item.group_src" target="_blank" class="group-link" :title="item.group_name">-->
+<!--                            <img width="30px;" :src="item.group_photo_50" alt="">&nbsp;&nbsp;{{ item.group_screen_name }}-->
+<!--                        </a>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--                </tbody>-->
+<!--            </table>            -->
+            <table>
                 <thead>
-                <tr class="d-flex">
-                    <th class="col-2">Date</th>
-                    <th class="col-3">Author</th>
-                    <th class="col-4">Post</th>
-                    <th class="col-3">Vk group</th>
-                </tr>
+                    <tr>
+                        <th>Date</th>
+                        <th>Author</th>
+                        <th>Post</th>
+                        <th>Vk group</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(item) in posts" class="d-flex">
-                    <td class="col-2">{{ item.date }}</td>
-                    <td class="col-3">
-                        <a :href="item.user_src" target="_blank" class="user-link">
-                            <img width="30px;" :src="item.photo_50" alt="">&nbsp;&nbsp;{{ item.first_name }}&nbsp;&nbsp;{{ item.last_name }}
-                        </a>
-                    </td>
-                    <td class="col-4">{{ item.text }}</td>
-                    <td class="col-3">
-                        <a :href="item.group_src" target="_blank" class="group-link" :title="item.group_name">
-                            <img width="30px;" :src="item.group_photo_50" alt="">&nbsp;&nbsp;{{ item.group_screen_name }}
-                        </a>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>08.09.20 17:09:08</td>
+                        <td>
+                            <a data-v-4109c2ca="" href="https://vk.com/id462314657" target="_blank" class="user-link"><img data-v-4109c2ca="" width="30px;" src="https://sun9-67.userapi.com/impg/c206724/v206724086/f9b9e/mLfb0OfLGvU.jpg?size=50x0&amp;quality=88&amp;crop=0,0,756,756&amp;sign=0c1ee710a2b864ee36d307460f40b3e7&amp;c_uniq_tag=hZdUgJYMA72-KgtCSY33CpczEnMyNZhDfZ9541yQz80&amp;ava=1" alt="">&nbsp;&nbsp;Максим&nbsp;&nbsp;Донецкий
+                            </a>
+                        </td>
+                        <td>Продам БН приват 24т по 2.65 , куплю безнал ошад приват, куплю 4 тыс синего дол по 75 Макеевка 0713933138</td>
+                        <td>
+                            <a data-v-4109c2ca="" href="https://vk.com/obmenvalut_donetsk" target="_blank" title="Курс валют обмен в Донецке! [Обменные пункты]" class="group-link"><img data-v-4109c2ca="" width="30px;" src="https://sun9-62.userapi.com/impf/c630317/v630317746/194b/BKf7CyuO0Zg.jpg?size=50x0&amp;quality=88&amp;crop=57,36,350,350&amp;sign=a99ce4c7e62409cc124542a08bf7a3a8&amp;c_uniq_tag=NmI9US0nOyYduujD2BtzBs_9nktQj-JrI2vA1MeLouE&amp;ava=1" alt="">&nbsp;&nbsp;obmenvalut_donetsk
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>08.09.20 17:09:08</td>
+                        <td>
+                            <a data-v-4109c2ca="" href="https://vk.com/id462314657" target="_blank" class="user-link"><img data-v-4109c2ca="" width="30px;" src="https://sun9-67.userapi.com/impg/c206724/v206724086/f9b9e/mLfb0OfLGvU.jpg?size=50x0&amp;quality=88&amp;crop=0,0,756,756&amp;sign=0c1ee710a2b864ee36d307460f40b3e7&amp;c_uniq_tag=hZdUgJYMA72-KgtCSY33CpczEnMyNZhDfZ9541yQz80&amp;ava=1" alt="">&nbsp;&nbsp;Максим&nbsp;&nbsp;Донецкий
+                            </a>
+                        </td>
+                        <td>Продам БН приват 24т по 2.65 , куплю безнал ошад Продам БН приват 24т по 2.65 , куплю безнал ошад приват, куплю 4 тыс синего дол по 75 Макеевка 0713933138</td>
+                        <td>
+                            <a data-v-4109c2ca="" href="https://vk.com/obmenvalut_donetsk" target="_blank" title="Курс валют обмен в Донецке! [Обменные пункты]" class="group-link"><img data-v-4109c2ca="" width="30px;" src="https://sun9-62.userapi.com/impf/c630317/v630317746/194b/BKf7CyuO0Zg.jpg?size=50x0&amp;quality=88&amp;crop=57,36,350,350&amp;sign=a99ce4c7e62409cc124542a08bf7a3a8&amp;c_uniq_tag=NmI9US0nOyYduujD2BtzBs_9nktQj-JrI2vA1MeLouE&amp;ava=1" alt="">&nbsp;&nbsp;obmenvalut_donetsk
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>08.09.20 17:09:08</td>
+                        <td>
+                            <a data-v-4109c2ca="" href="https://vk.com/id462314657" target="_blank" class="user-link"><img data-v-4109c2ca="" width="30px;" src="https://sun9-67.userapi.com/impg/c206724/v206724086/f9b9e/mLfb0OfLGvU.jpg?size=50x0&amp;quality=88&amp;crop=0,0,756,756&amp;sign=0c1ee710a2b864ee36d307460f40b3e7&amp;c_uniq_tag=hZdUgJYMA72-KgtCSY33CpczEnMyNZhDfZ9541yQz80&amp;ava=1" alt="">&nbsp;&nbsp;Максим&nbsp;&nbsp;Донецкий
+                            </a>
+                        </td>
+                        <td>Продам БН приват 24т по 2.65 , куплю безнал ошад Продам БН приват 24т по 2.65 , куплю безнал ошад приват, куплю 4 тыс синего дол по 75 Макеевка 0713933138</td>
+                        <td>
+                            <a data-v-4109c2ca="" href="https://vk.com/obmenvalut_donetsk" target="_blank" title="Курс валют обмен в Донецке! [Обменные пункты]" class="group-link"><img data-v-4109c2ca="" width="30px;" src="https://sun9-62.userapi.com/impf/c630317/v630317746/194b/BKf7CyuO0Zg.jpg?size=50x0&amp;quality=88&amp;crop=57,36,350,350&amp;sign=a99ce4c7e62409cc124542a08bf7a3a8&amp;c_uniq_tag=NmI9US0nOyYduujD2BtzBs_9nktQj-JrI2vA1MeLouE&amp;ava=1" alt="">&nbsp;&nbsp;obmenvalut_donetsk
+                            </a>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -94,14 +139,14 @@
             return {
                 groups: [
                     {name: 'obmenvalut_donetsk'},
-                    {name: 'obmen_valut_donetsk'},
-                    {name: 'donfinance'},
-                    {name: 'donetsk'},
-                    {name: 'club156050748'},
-                    {name: 'moneydonetsk'},
-                    {name: 'obmenvalyut_dpr'},
-                    {name: 'donetsk_obmen_valyuta'},
-                    {name: 'kursvalut_donetsk'}
+                    // {name: 'obmen_valut_donetsk'},
+                    // {name: 'donfinance'},
+                    // {name: 'donetsk'},
+                    // {name: 'club156050748'},
+                    // {name: 'moneydonetsk'},
+                    // {name: 'obmenvalyut_dpr'},
+                    // {name: 'donetsk_obmen_valyuta'},
+                    // {name: 'kursvalut_donetsk'}
                 ],
                 errors: [],
                 error_keywords_buy: false,
@@ -199,10 +244,6 @@
             }
         }
 
-        .table-responsive {
-            margin-top: 25px;
-        }
-
         .alert-block {
             padding: 0.4rem 0.8rem;
             p {
@@ -219,9 +260,6 @@
 
         button.btn:focus {
             box-shadow: none;
-        }
-
-        .input-days {
         }
 
         .left input[type='text'], .left .input-days {
@@ -242,59 +280,32 @@
         }
         .input-block {
             position: relative;
-            //border: 1px solid red;
-            //display: flex;
-            //flex-wrap: wrap;
             margin-bottom: 18px;
 
             button {
                 position: absolute;
                 top: 0;
                 right: -20px;
-                //display: none;
-                //position: absolute;
-                //float: right;
-                //border: 1px solid #000;
-                //right: -39px;
-                //top: 0;
-                //width: 10%;
-                //flex-grow: 1;
             }
 
             input[type='text'] {
             }
         }
 
-        .btn-add-group {
-            //margin-top: 10px;
-        }
-
         .form-control {
             background-image: none;
-            //padding: 0.375rem 0.75rem;
         }
 
         .keywords-block {
-            //border: 1px solid red;
             margin-bottom: 18px;
-            //margin-left: -10px;
             position: relative;
             label {
                 @include media-breakpoint-down(xs) {
                     margin-left: -20px !important;
                 }
-                //border: 1px solid #000;
-                //position: relative;
-                //width: 40px;
                 margin: 0 !important;
                 padding: 0.375rem 0.75rem;
                 input[type='radio'] {
-                    //position: absolute;
-                    //top: 0;
-                    //left: 0;
-                    //right: 0;
-                    //bottom: 0;
-                    //margin: auto;
                     &:hover {
                         cursor: pointer;
                     }
@@ -323,15 +334,11 @@
         }
 
         .button-block {
-            //border: 1px solid black;
-            //margin-top: 20px;
             display: flex;
             justify-content: space-around;
-            //flex-wrap: nowrap;
 
             .money-img {
                 max-width: 70px;
-                //max-height: 35px;
 
                 @include media-breakpoint-down(xs) {
                     max-width: 50px;
@@ -359,6 +366,52 @@
         }
 
 
+        .table-responsive {
+            table {
+                border: 1px solid #ddd;
+                border-collapse: separate;
+                border-spacing: 0;
+                border-radius: 4px;
+                //margin-top: 25px;
+                //th {
+                //    padding: 4px 5px;
+                //}
+                //
+                th, td {
+                    padding: 4px 5px;
+                    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+                    font-size: 13px;
+                    line-height: 18px;
+                    color: #333333;
+                    //white-space: nowrap
+                }
+
+                tbody tr td:first-child,
+                thead tr th:first-child {
+                    text-align: center;
+                }
+
+                tbody tr:nth-child(odd) td, tbody tr:nth-child(odd) th {
+                    background-color: #f9f9f9;
+                }
+
+                thead:first-child tr:first-child th:first-child,
+                tbody:first-child tr:first-child td:first-child {
+                    border-radius: 4px 0 0 0;
+                }
+
+                thead:first-child tr:first-child th,
+                tbody:first-child tr:first-child th,
+                tbody:first-child tr:first-child td {
+                    border-top: 0;
+                }
+
+                th+th, td+td, th+td, td+th {
+                    border-left: 1px solid #ddd;
+                }
+
+            }
+        }
     }
 
     .user-link:hover, .group-link:hover {
