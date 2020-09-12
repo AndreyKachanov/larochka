@@ -42,7 +42,7 @@
                 <img class="money-img" src="/assets/images/money-bag.svg" title="" alt="">
             </div>
         </div>
-        <div class="table-responsive">
+        <div class="tbl">
 <!--            <table v-if="posts.length" class="table table-striped table-messages">-->
 <!--                <thead>-->
 <!--                <tr class="d-flex">-->
@@ -397,8 +397,9 @@
         }
 
 
-        .table-responsive {
+        .tbl {
             margin-top: 20px;
+            margin-bottom: 0;
             table {
                 border-left: 1px solid #dee2e6;
                 border-right: 1px solid #dee2e6;
@@ -409,7 +410,7 @@
 
                 th, td {
                     padding: 4px 5px;
-                    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+                    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
                     font-size: 13px;
                     line-height: 18px;
                     border-top: 1px solid #dee2e6;
@@ -421,6 +422,7 @@
 
                 tbody tr td:first-child {
                     text-align: center;
+                    color: #818c99;
                 }
 
                 tbody tr:nth-child(odd) td, tbody tr:nth-child(odd) th {
@@ -428,7 +430,7 @@
                 }
                 thead tr:first-child th:first-child,
                 tbody tr:first-child td:first-child {
-                    border-radius: 4px 0 0 0;
+                    //border-radius: 4px 0 0 0;
                 }
 
                 th+th, td+td, th+td, td+th {
@@ -459,13 +461,19 @@
             }
 
             @include media-breakpoint-down(sm) {
+                margin-left: -6px;
+                margin-right: -6px;
+                width: auto;
+                margin-bottom: -21px;
+
                 table, thead, tbody, th, td, tr {
                     display: block;
                 }
 
                 table {
-                    border-bottom: none;
-                    border-top: 1px solid #dee2e6;
+                    border: none;
+                    //background-color: #f2f2f2;
+                    //border-top: 1px solid #dee2e6;
 
                     td + td {
                         border-left: none;
@@ -477,29 +485,81 @@
                         left: -9999px;
                     }
 
-                    td {
-                        border: none;
-                        border-bottom: 1px solid #dee2e6;
+                    tbody tr {
                         position: relative;
-                        padding-left: 30%;
+                        border: 1px solid #dee2e6;
+                        background-color: #f2f2f2;
+                        //border-radius: 4px;
+                        margin-bottom: 15px;
+                        //box-shadow: rgb(211, 217, 222) 0px 1px 0px 0px, rgb(231, 232, 236) 0px 0px 0px 1px;
+                        //color: rgb(0, 0, 0);
+
+                        &:last-child {
+                            margin-bottom: 0;
+                            border-radius: 0 0 4px 4px;
+                        }
+                    }
+
+                    tbody tr td:first-child {
+                        padding: 0;
+                        position: absolute;
+                        z-index: 1;
+                        border: none;
+                        left: 71px;
+                        top: 33px;
+                        color: rgb(129, 140, 153);
+                        font-size: 13px;
+
+                        @include media-breakpoint-down(xs) {
+                            left: 51px;
+                            top: 24px;
+                        }
+                    }
+
+                    tbody tr td:last-child {
+                        display: none;
+                    }
+
+                    tbody tr td:nth-child(2) a {
+                        //display: block;
+                        //position: relative;
+                        //border: 1px solid black;
+
+                        img {
+                            max-width: 48px;
+
+                            @include media-breakpoint-down(xs) {
+                                max-width: 32px;
+                            }
+                        }
+
+                        span {
+                            //border: 1px solid red;
+                            //display: block;
+                            position: absolute;
+                            left: 72px;
+                            top: 12px;
+                            color: #2C2D2E;
+                            font-size: 15px;
+                            @include media-breakpoint-down(xs) {
+                                left: 51px;
+                                top: 8px;
+                            }
+                        }
+                    }
+
+
+                    td {
+                        padding-top: 6px;
+                        padding-left: 16px;
+                        //padding-right: 16px;
+                        border: none;
+                        position: relative;
                         white-space: normal;
                         text-align: left !important;
 
-                        &:before {
-                            /* Now like a table header */
-                            position: absolute;
-                            /* Top/left values mimic padding */
-                            top: 6px;
-                            left: 6px;
-                            width: 45%;
-                            padding-right: 10px;
-                            white-space: nowrap;
-                            text-align:left;
-                            font-weight: bold;
-                        }
-
-                        &:before {
-                            content: attr(data-title);
+                        @include media-breakpoint-down(xs) {
+                            padding-left: 10px;
                         }
                     }
                 }

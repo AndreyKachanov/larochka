@@ -35,6 +35,10 @@ body {
 
 .app-content {
   flex: 1;
+
+    //@include media-breakpoint-down(sm) {
+    //    background-color: #edeef0;;
+    //}
 }
 
 .table th, .table td {
