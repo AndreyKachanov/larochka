@@ -38,7 +38,7 @@
             </div>
             <div class="button-block">
                 <img class="money-img" src="/assets/images/money-bag.svg" title="" alt="">
-                <button @click="start" class="btn btn-success">Start parse</button>
+                <button @click="start" class="btn btn-danger">Start parse</button>
                 <img class="money-img" src="/assets/images/money-bag.svg" title="" alt="">
             </div>
         </div>
@@ -69,8 +69,8 @@
 <!--                </tr>-->
 <!--                </tbody>-->
 <!--            </table>            -->
-<!--            <table v-if="posts.length">-->
-            <table>
+            <table v-if="posts.length">
+<!--            <table>-->
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -80,72 +80,72 @@
                     </tr>
                 </thead>
                 <tbody>
-<!--                    <tr v-for="(item) in posts">-->
-<!--                        <td data-title="Date">{{ item.date }}</td>-->
+                    <tr v-for="(item) in posts">
+                        <td data-title="Date">{{ item.date }}</td>
+                        <td data-title="Author">
+                            <a :href="item.user_src" target="_blank">
+                                <img :src="item.photo_50" alt="">
+                                <span>{{ item.first_name }}&nbsp;&nbsp;{{ item.last_name }}</span>
+                            </a>
+                        </td>
+                        <td data-title="Post">
+                            {{ item.text }}
+                        </td>
+                        <td data-title="Vk group">
+                            <a :href="item.group_src" target="_blank" class="group-link" :title="item.group_name">
+                                <img :src="item.group_photo_50" alt="">
+                                <span>{{ item.group_screen_name }}</span>
+                            </a>
+                        </td>
+                    </tr>
+<!--                    <tr>-->
+<!--                        <td data-title="Date">08.09.20 17:09:08</td>-->
 <!--                        <td data-title="Author">-->
-<!--                            <a :href="item.user_src" target="_blank">-->
-<!--                                <img :src="item.photo_50" alt="">-->
-<!--                                <span>{{ item.first_name }}&nbsp;&nbsp;{{ item.last_name }}</span>-->
+<!--                            <a href="https://vk.com/id462314657" target="_blank">-->
+<!--                                <img src="https://sun9-67.userapi.com/impg/c206724/v206724086/f9b9e/mLfb0OfLGvU.jpg?size=50x0&amp;quality=88&amp;crop=0,0,756,756&amp;sign=0c1ee710a2b864ee36d307460f40b3e7&amp;c_uniq_tag=hZdUgJYMA72-KgtCSY33CpczEnMyNZhDfZ9541yQz80&amp;ava=1" alt="">-->
+<!--                                <span>Максим Донецкий</span>-->
 <!--                            </a>-->
 <!--                        </td>-->
-<!--                        <td data-title="Post">-->
-<!--                            {{ item.text }}-->
-<!--                        </td>-->
+<!--                        <td data-title="Post">Продам БН приват 24т по 2.65 , куплю безнал ошад приват, куплю 4 тыс синего дол по 75 Макеевка 0713933138</td>-->
 <!--                        <td data-title="Vk group">-->
-<!--                            <a :href="item.group_src" target="_blank" class="group-link" :title="item.group_name">-->
-<!--                                <img :src="item.group_photo_50" alt="">-->
-<!--                                <span>{{ item.group_screen_name }}</span>-->
+<!--                            <a data-v-4109c2ca="" href="https://vk.com/obmenvalut_donetsk" target="_blank" title="Курс валют обмен в Донецке! [Обменные пункты]">-->
+<!--                                <img data-v-4109c2ca="" src="https://sun9-62.userapi.com/impf/c630317/v630317746/194b/BKf7CyuO0Zg.jpg?size=50x0&amp;quality=88&amp;crop=57,36,350,350&amp;sign=a99ce4c7e62409cc124542a08bf7a3a8&amp;c_uniq_tag=NmI9US0nOyYduujD2BtzBs_9nktQj-JrI2vA1MeLouE&amp;ava=1" alt="">-->
+<!--                                <span>obmenvalut_donetsk</span>-->
 <!--                            </a>-->
 <!--                        </td>-->
 <!--                    </tr>-->
-                    <tr>
-                        <td data-title="Date">08.09.20 17:09:08</td>
-                        <td data-title="Author">
-                            <a href="https://vk.com/id462314657" target="_blank">
-                                <img src="https://sun9-67.userapi.com/impg/c206724/v206724086/f9b9e/mLfb0OfLGvU.jpg?size=50x0&amp;quality=88&amp;crop=0,0,756,756&amp;sign=0c1ee710a2b864ee36d307460f40b3e7&amp;c_uniq_tag=hZdUgJYMA72-KgtCSY33CpczEnMyNZhDfZ9541yQz80&amp;ava=1" alt="">
-                                <span>Максим Донецкий</span>
-                            </a>
-                        </td>
-                        <td data-title="Post">Продам БН приват 24т по 2.65 , куплю безнал ошад приват, куплю 4 тыс синего дол по 75 Макеевка 0713933138</td>
-                        <td data-title="Vk group">
-                            <a data-v-4109c2ca="" href="https://vk.com/obmenvalut_donetsk" target="_blank" title="Курс валют обмен в Донецке! [Обменные пункты]">
-                                <img data-v-4109c2ca="" src="https://sun9-62.userapi.com/impf/c630317/v630317746/194b/BKf7CyuO0Zg.jpg?size=50x0&amp;quality=88&amp;crop=57,36,350,350&amp;sign=a99ce4c7e62409cc124542a08bf7a3a8&amp;c_uniq_tag=NmI9US0nOyYduujD2BtzBs_9nktQj-JrI2vA1MeLouE&amp;ava=1" alt="">
-                                <span>obmenvalut_donetsk</span>
-                            </a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td data-title="Date">08.09.20 17:09:08</td>
-                        <td data-title="Author">
-                            <a href="https://vk.com/id462314657" target="_blank">
-                                <img src="https://sun9-67.userapi.com/impg/c206724/v206724086/f9b9e/mLfb0OfLGvU.jpg?size=50x0&amp;quality=88&amp;crop=0,0,756,756&amp;sign=0c1ee710a2b864ee36d307460f40b3e7&amp;c_uniq_tag=hZdUgJYMA72-KgtCSY33CpczEnMyNZhDfZ9541yQz80&amp;ava=1" alt="">
-                                <span>Максим Донецкий</span>
-                            </a>
-                        </td>
-                        <td data-title="Post">Продам БН приват 24т по 2.65 , куплю безнал ошад приват, куплю 4 тыс синего дол по 75 Макеевка 0713933138</td>
-                        <td data-title="Vk group">
-                            <a data-v-4109c2ca="" href="https://vk.com/obmenvalut_donetsk" target="_blank" title="Курс валют обмен в Донецке! [Обменные пункты]">
-                                <img data-v-4109c2ca="" src="https://sun9-62.userapi.com/impf/c630317/v630317746/194b/BKf7CyuO0Zg.jpg?size=50x0&amp;quality=88&amp;crop=57,36,350,350&amp;sign=a99ce4c7e62409cc124542a08bf7a3a8&amp;c_uniq_tag=NmI9US0nOyYduujD2BtzBs_9nktQj-JrI2vA1MeLouE&amp;ava=1" alt="">
-                                <span>obmenvalut_donetsk</span>
-                            </a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td data-title="Date">08.09.20 17:09:08</td>
-                        <td data-title="Author">
-                            <a href="https://vk.com/id462314657" target="_blank">
-                                <img src="https://sun9-67.userapi.com/impg/c206724/v206724086/f9b9e/mLfb0OfLGvU.jpg?size=50x0&amp;quality=88&amp;crop=0,0,756,756&amp;sign=0c1ee710a2b864ee36d307460f40b3e7&amp;c_uniq_tag=hZdUgJYMA72-KgtCSY33CpczEnMyNZhDfZ9541yQz80&amp;ava=1" alt="">
-                                <span>Максим Донецкий</span>
-                            </a>
-                        </td>
-                        <td data-title="Post">Продам БН приват 24т по 2.65 , куплю безнал ошад приват, куплю 4 тыс синего дол по 75 Макеевка 0713933138</td>
-                        <td data-title="Vk group">
-                            <a data-v-4109c2ca="" href="https://vk.com/obmenvalut_donetsk" target="_blank" title="Курс валют обмен в Донецке! [Обменные пункты]">
-                                <img data-v-4109c2ca="" src="https://sun9-62.userapi.com/impf/c630317/v630317746/194b/BKf7CyuO0Zg.jpg?size=50x0&amp;quality=88&amp;crop=57,36,350,350&amp;sign=a99ce4c7e62409cc124542a08bf7a3a8&amp;c_uniq_tag=NmI9US0nOyYduujD2BtzBs_9nktQj-JrI2vA1MeLouE&amp;ava=1" alt="">
-                                <span>obmenvalut_donetsk</span>
-                            </a>
-                        </td>
-                    </tr>
+<!--                    <tr>-->
+<!--                        <td data-title="Date">08.09.20 17:09:08</td>-->
+<!--                        <td data-title="Author">-->
+<!--                            <a href="https://vk.com/id462314657" target="_blank">-->
+<!--                                <img src="https://sun9-67.userapi.com/impg/c206724/v206724086/f9b9e/mLfb0OfLGvU.jpg?size=50x0&amp;quality=88&amp;crop=0,0,756,756&amp;sign=0c1ee710a2b864ee36d307460f40b3e7&amp;c_uniq_tag=hZdUgJYMA72-KgtCSY33CpczEnMyNZhDfZ9541yQz80&amp;ava=1" alt="">-->
+<!--                                <span>Максим Донецкий Максим Донецкий Максим Донецкий</span>-->
+<!--                            </a>-->
+<!--                        </td>-->
+<!--                        <td data-title="Post">Продам БН приват 24т по 2.65 , куплю безнал ошад приват, куплю 4 тыс синего дол по 75 Макеевка 0713933138</td>-->
+<!--                        <td data-title="Vk group">-->
+<!--                            <a data-v-4109c2ca="" href="https://vk.com/obmenvalut_donetsk" target="_blank" title="Курс валют обмен в Донецке! [Обменные пункты]">-->
+<!--                                <img data-v-4109c2ca="" src="https://sun9-62.userapi.com/impf/c630317/v630317746/194b/BKf7CyuO0Zg.jpg?size=50x0&amp;quality=88&amp;crop=57,36,350,350&amp;sign=a99ce4c7e62409cc124542a08bf7a3a8&amp;c_uniq_tag=NmI9US0nOyYduujD2BtzBs_9nktQj-JrI2vA1MeLouE&amp;ava=1" alt="">-->
+<!--                                <span>obmenvalut_donetsk_obmenvalut_donetsk</span>-->
+<!--                            </a>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                    <tr>-->
+<!--                        <td data-title="Date">08.09.20 17:09:08</td>-->
+<!--                        <td data-title="Author">-->
+<!--                            <a href="https://vk.com/id462314657" target="_blank">-->
+<!--                                <img src="https://sun9-67.userapi.com/impg/c206724/v206724086/f9b9e/mLfb0OfLGvU.jpg?size=50x0&amp;quality=88&amp;crop=0,0,756,756&amp;sign=0c1ee710a2b864ee36d307460f40b3e7&amp;c_uniq_tag=hZdUgJYMA72-KgtCSY33CpczEnMyNZhDfZ9541yQz80&amp;ava=1" alt="">-->
+<!--                                <span>Максим Донецкий</span>-->
+<!--                            </a>-->
+<!--                        </td>-->
+<!--                        <td data-title="Post">Продам БН приват 24т по 2.65 , куплю безнал ошад приват, куплю 4 тыс синего дол по 75 Макеевка 0713933138</td>-->
+<!--                        <td data-title="Vk group">-->
+<!--                            <a data-v-4109c2ca="" href="https://vk.com/obmenvalut_donetsk" target="_blank" title="Курс валют обмен в Донецке! [Обменные пункты]">-->
+<!--                                <img data-v-4109c2ca="" src="https://sun9-62.userapi.com/impf/c630317/v630317746/194b/BKf7CyuO0Zg.jpg?size=50x0&amp;quality=88&amp;crop=57,36,350,350&amp;sign=a99ce4c7e62409cc124542a08bf7a3a8&amp;c_uniq_tag=NmI9US0nOyYduujD2BtzBs_9nktQj-JrI2vA1MeLouE&amp;ava=1" alt="">-->
+<!--                                <span>obmenvalut_donetsk</span>-->
+<!--                            </a>-->
+<!--                        </td>-->
+<!--                    </tr>-->
                 </tbody>
             </table>
         </div>
@@ -170,21 +170,21 @@
             return {
                 groups: [
                     {name: 'obmenvalut_donetsk'},
-                    // {name: 'obmen_valut_donetsk'},
-                    // {name: 'donfinance'},
-                    // {name: 'donetsk'},
-                    // {name: 'club156050748'},
-                    // {name: 'moneydonetsk'},
-                    // {name: 'obmenvalyut_dpr'},
-                    // {name: 'donetsk_obmen_valyuta'},
-                    // {name: 'kursvalut_donetsk'}
+                    {name: 'obmen_valut_donetsk'},
+                    {name: 'donfinance'},
+                    {name: 'donetsk'},
+                    {name: 'club156050748'},
+                    {name: 'moneydonetsk'},
+                    {name: 'obmenvalyut_dpr'},
+                    {name: 'donetsk_obmen_valyuta'},
+                    {name: 'kursvalut_donetsk'}
                 ],
                 errors: [],
                 error_keywords_buy: false,
                 error_keywords_sale: false,
                 parsing_start: false,
                 keywords_buy: 'куплю бн, куплю б.н, куплю безнал, куплю б/н, куплю б\\н, куплю приват, куплю гривну, куплю безналичную, куплю грн',
-                //keywords_buy: 'куплю бн',
+                // keywords_buy: 'куплю бн',
                 keywords_sale: 'продам бн, продам б.н, продам безнал, продам б/н, продам б\\н продам приват, продам гривну, продам безналичную, продам грн',
                 radio_keywords: 'buy',
                 days: 0,
@@ -368,6 +368,10 @@
             display: flex;
             justify-content: space-around;
 
+            @include media-breakpoint-down(sm) {
+                justify-content: flex-end;
+            }
+
             .money-img {
                 max-width: 70px;
 
@@ -379,7 +383,7 @@
                     max-width: 50px;
                 }
                 @include media-breakpoint-down(sm) {
-                    max-width: 40px;
+                    display: none;
                 }
             }
 
@@ -391,7 +395,11 @@
                     width: 40%;
                 }
                 @include media-breakpoint-down(sm) {
-                    width: 50%;
+                    width: calc(100% - 38px);
+                }
+
+                @include media-breakpoint-down(xs) {
+                    width: calc(100% - 18px);
                 }
             }
         }
@@ -422,7 +430,6 @@
 
                 tbody tr td:first-child {
                     text-align: center;
-                    color: #818c99;
                 }
 
                 tbody tr:nth-child(odd) td, tbody tr:nth-child(odd) th {
@@ -430,7 +437,6 @@
                 }
                 thead tr:first-child th:first-child,
                 tbody tr:first-child td:first-child {
-                    //border-radius: 4px 0 0 0;
                 }
 
                 th+th, td+td, th+td, td+th {
@@ -439,9 +445,11 @@
 
                 tbody tr td:nth-child(2), tbody tr td:last-child {
                     a {
-                        display: inline-block;
-                        white-space: nowrap;
-                        color: #2a5885 !important;
+                        display: flex;
+                        align-items: center;
+                        min-width: 170px;
+                        max-width: 170px;
+                        color: #2a5885;
                         &:hover {
                             text-decoration: none;
                         }
@@ -452,6 +460,10 @@
                             margin-right: 3px;
                         }
                         span {
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            margin-left: 3px;
                             &:hover {
                                 text-decoration: underline;
                             }
@@ -472,8 +484,6 @@
 
                 table {
                     border: none;
-                    //background-color: #f2f2f2;
-                    //border-top: 1px solid #dee2e6;
 
                     td + td {
                         border-left: none;
@@ -489,10 +499,7 @@
                         position: relative;
                         border: 1px solid #dee2e6;
                         background-color: #f2f2f2;
-                        //border-radius: 4px;
                         margin-bottom: 15px;
-                        //box-shadow: rgb(211, 217, 222) 0px 1px 0px 0px, rgb(231, 232, 236) 0px 0px 0px 1px;
-                        //color: rgb(0, 0, 0);
 
                         &:last-child {
                             margin-bottom: 0;
@@ -505,25 +512,43 @@
                         position: absolute;
                         z-index: 1;
                         border: none;
-                        left: 71px;
+                        left: 75px;
                         top: 33px;
                         color: rgb(129, 140, 153);
                         font-size: 13px;
 
                         @include media-breakpoint-down(xs) {
-                            left: 51px;
-                            top: 24px;
+                            left: 53px;
+                            top: 28px;
                         }
                     }
 
                     tbody tr td:last-child {
-                        display: none;
+                        //border: 1px solid black;
+                        width: 33%;
+                        position: absolute;
+                        right: 5px;
+                        top: 5px;
+                        padding: 0;
+
+                        @include media-breakpoint-down(xs) {
+                            width: calc(45% - 60px);
+                        }
+
+                        a {
+                            img {
+                                @include media-breakpoint-down(xs) {
+                                    max-width: 23px;
+                                }
+                            }
+                            //border: 1px solid red;
+                            min-width: auto !important;
+                            max-width: none !important;
+                        }
                     }
 
                     tbody tr td:nth-child(2) a {
-                        //display: block;
-                        //position: relative;
-                        //border: 1px solid black;
+                        display: block;
 
                         img {
                             max-width: 48px;
@@ -534,25 +559,28 @@
                         }
 
                         span {
-                            //border: 1px solid red;
-                            //display: block;
                             position: absolute;
                             left: 72px;
                             top: 12px;
                             color: #2C2D2E;
                             font-size: 15px;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            max-width: 160px;
+
                             @include media-breakpoint-down(xs) {
                                 left: 51px;
-                                top: 8px;
+                                top: 9px;
+                                font-size: 14px;
+                                max-width: 145px;
                             }
                         }
                     }
 
-
                     td {
                         padding-top: 6px;
                         padding-left: 16px;
-                        //padding-right: 16px;
                         border: none;
                         position: relative;
                         white-space: normal;
@@ -565,9 +593,6 @@
                 }
             }
         }
-
-
-
     }
 
     .user-link:hover, .group-link:hover {
