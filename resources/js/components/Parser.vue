@@ -145,8 +145,8 @@
             return {
                 groups: [
                     {name: 'obmenvalut_donetsk'},
-                    // {name: 'obmen_valut_donetsk'},
-                    // {name: 'donfinance'},
+                    {name: 'obmen_valut_donetsk'},
+                    {name: 'donfinance'},
                     // {name: 'donetsk'},
                     // {name: 'club156050748'},
                     // {name: 'moneydonetsk'},
@@ -158,8 +158,8 @@
                 error_keywords_buy: false,
                 error_keywords_sale: false,
                 parsing_start: false,
-                // keywords_buy: 'куплю бн, куплю б.н, куплю безнал, куплю б/н, куплю б\\н, куплю приват, куплю гривну, куплю безналичную, куплю грн',
-                keywords_buy: 'куплю бн',
+                keywords_buy: 'куплю бн, куплю б.н, куплю безнал, куплю б/н, куплю б\\н, куплю приват, куплю гривну, куплю безналичную, куплю грн',
+                // keywords_buy: 'куплю бн',
                 keywords_sale: 'продам бн, продам б.н, продам безнал, продам б/н, продам б\\н продам приват, продам гривну, продам безналичную, продам грн',
                 radio_keywords: 'buy',
                 days: 0,
