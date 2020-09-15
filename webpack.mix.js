@@ -10,6 +10,10 @@ if (env === 'production' || env === 'dev') {
         .js('resources/js/snake.js', 'public/js')
         .sass('resources/sass/app.scss', 'public/css')
         .sass('resources/sass/snake.scss', 'public/css')
+        .options({
+            extractVueStyles: false,
+            globalVueStyles: 'resources/sass/vue_components.scss'
+        })
         .version();
 // env === local
 } else {
