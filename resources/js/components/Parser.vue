@@ -33,7 +33,7 @@
                 <label>
                     <input type="radio" name="radio_keywords" v-model="radio_keywords" value="sale">
                 </label>
-                <input :class="[error_keywords_sale ? 'is-invalid' : '', 'form-control']" type="text" id="keywords_sale" v-model="keywords_sale" name="keywords_sale">
+                    <input :class="[error_keywords_sale ? 'is-invalid' : '', 'form-control']" type="text" id="keywords_sale" v-model="keywords_sale" name="keywords_sale">
                 <div v-for="(error) in errors.keywords" class="invalid-keywords invalid-feedback" v-html="error"></div>
             </div>
             <div class="button-block">
@@ -43,32 +43,6 @@
             </div>
         </div>
         <div class="tbl">
-<!--            <table v-if="posts.length" class="table table-striped table-messages">-->
-<!--                <thead>-->
-<!--                <tr class="d-flex">-->
-<!--                    <th class="col-2">Date</th>-->
-<!--                    <th class="col-3">Author</th>-->
-<!--                    <th class="col-4">Post</th>-->
-<!--                    <th class="col-3">Vk group</th>-->
-<!--                </tr>-->
-<!--                </thead>-->
-<!--                <tbody>-->
-<!--                <tr v-for="(item) in posts" class="d-flex">-->
-<!--                    <td class="col-1">{{ item.date }}</td>-->
-<!--                    <td class="col-3">-->
-<!--                        <a :href="item.user_src" target="_blank" class="user-link">-->
-<!--                            <img width="30px;" :src="item.photo_50" alt="">&nbsp;&nbsp;{{ item.first_name }}&nbsp;&nbsp;{{ item.last_name }}-->
-<!--                        </a>-->
-<!--                    </td>-->
-<!--                    <td class="col-4">{{ item.text }}</td>-->
-<!--                    <td class="col-3">-->
-<!--                        <a :href="item.group_src" target="_blank" class="group-link" :title="item.group_name">-->
-<!--                            <img width="30px;" :src="item.group_photo_50" alt="">&nbsp;&nbsp;{{ item.group_screen_name }}-->
-<!--                        </a>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                </tbody>-->
-<!--            </table>            -->
             <table v-if="posts.length">
 <!--            <table>-->
                 <thead>
@@ -85,7 +59,9 @@
                         <td data-title="Author">
                             <a :href="item.user_src" target="_blank">
                                 <img :src="item.photo_50" alt="">
-                                <span>{{ item.first_name }}&nbsp;&nbsp;{{ item.last_name }}</span>
+                                <span :title="item.first_name + ' ' + item.last_name">
+                                    {{ item.first_name }}&nbsp;&nbsp;{{ item.last_name }}
+                                </span>
                             </a>
                         </td>
                         <td data-title="Post">
@@ -154,13 +130,12 @@
 </template>
 
 <script>
-    import Vue from 'vue';
     // Import component
-    //import Loading from 'vue-loading-overlay';
+    import Loading from 'vue-loading-overlay';
     // Import stylesheet
-    //import 'vue-loading-overlay/dist/vue-loading.css';
+    import 'vue-loading-overlay/dist/vue-loading.css';
     // Init plugin
-    //Vue.use(Loading);
+    Vue.use(Loading);
 
 
     export default {
@@ -170,21 +145,21 @@
             return {
                 groups: [
                     {name: 'obmenvalut_donetsk'},
-                    {name: 'obmen_valut_donetsk'},
-                    {name: 'donfinance'},
-                    {name: 'donetsk'},
-                    {name: 'club156050748'},
-                    {name: 'moneydonetsk'},
-                    {name: 'obmenvalyut_dpr'},
-                    {name: 'donetsk_obmen_valyuta'},
-                    {name: 'kursvalut_donetsk'}
+                    // {name: 'obmen_valut_donetsk'},
+                    // {name: 'donfinance'},
+                    // {name: 'donetsk'},
+                    // {name: 'club156050748'},
+                    // {name: 'moneydonetsk'},
+                    // {name: 'obmenvalyut_dpr'},
+                    // {name: 'donetsk_obmen_valyuta'},
+                    // {name: 'kursvalut_donetsk'}
                 ],
                 errors: [],
                 error_keywords_buy: false,
                 error_keywords_sale: false,
                 parsing_start: false,
-                keywords_buy: 'куплю бн, куплю б.н, куплю безнал, куплю б/н, куплю б\\н, куплю приват, куплю гривну, куплю безналичную, куплю грн',
-                // keywords_buy: 'куплю бн',
+                // keywords_buy: 'куплю бн, куплю б.н, куплю безнал, куплю б/н, куплю б\\н, куплю приват, куплю гривну, куплю безналичную, куплю грн',
+                keywords_buy: 'куплю бн',
                 keywords_sale: 'продам бн, продам б.н, продам безнал, продам б/н, продам б\\н продам приват, продам гривну, продам безналичную, продам грн',
                 radio_keywords: 'buy',
                 days: 0,
@@ -206,15 +181,15 @@
         },
         methods: {
             start() {
-                // let loader = this.$loading.show({
-                //     // Optional parameters
-                //     container: this.fullPage ? null : this.$refs.formContainer,
-                //     loader: 'bars',
-                //     color: '#4db24d',
-                //     width: 128,
-                //     height: 128,
-                //     backgroundColor: '#b6b3ff'
-                // });
+                let loader = this.$loading.show({
+                    // Optional parameters
+                    container: this.fullPage ? null : this.$refs.formContainer,
+                    loader: 'bars',
+                    color: '#4db24d',
+                    width: 128,
+                    height: 128,
+                    backgroundColor: '#b6b3ff'
+                });
 
                 let obj = {};
 
@@ -223,11 +198,11 @@
                 obj['days'] = this.days;
 
                 axios.post(this.route_parse, obj).then((response) => {
-                    console.log(response.data.error);
-                    // setTimeout(() => loader.hide(), 1200);
+                    // console.log(response.data.error);
+                    setTimeout(() => loader.hide(), 1200);
                     this.errors = [];
                 }).catch(error => {
-                    //loader.hide();
+                    loader.hide();
                     //console.log(error.response.data.response_error);
                     //console.log(error.response.data.message);
                     if (typeof error.response.data.response_error !== 'undefined') {
@@ -243,11 +218,7 @@
                                 this.error_keywords_buy = false;
                             }
                         }
-
-                        //console.log(1);
                     }
-                    //console.log(error.response);
-
                 }).then(() => {});
             },
             addGroup: function () {
@@ -268,8 +239,6 @@
 <style lang="scss" scoped>
     .groups-block {
         .left {
-            //margin-bottom: 20px;
-
             .main-label {
                 margin-top: 10px;
             }
@@ -295,19 +264,6 @@
 
         .left input[type='text'], .left .input-days {
             width: calc(100% - 17px);
-            //@include media-breakpoint-up(xs) {
-            //    width: calc(100% - 17px);
-            //}
-            //
-            //@include media-breakpoint-up(sm) {
-            //    width: 92%;
-            //}
-            //@include media-breakpoint-up(md) {
-            //    width: 93%;
-            //}
-            //@include media-breakpoint-up(lg) {
-            //    width: 95%;
-            //}
         }
         .input-block {
             position: relative;
