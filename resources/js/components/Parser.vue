@@ -58,7 +58,10 @@
                         <td data-title="Date">{{ item.date }}</td>
                         <td data-title="Author">
                             <a :href="item.user_src" target="_blank">
-                                <img :src="item.photo_50" alt="">
+                                <img v-if="item.photo_50 === 'https://vk.com/images/camera_50.png?ava=1' "
+                                    src="/assets/images/camera_50.png" alt="">
+                                <img v-else :src="item.photo_50" alt="">
+
                                 <span :title="item.first_name + ' ' + item.last_name">
                                     {{ item.first_name }}&nbsp;&nbsp;{{ item.last_name }}
                                 </span>
